@@ -8,24 +8,18 @@
   </head>
   <body>
     <div id="mocha"></div>
-
-    <!--
-        <script src="https://unpkg.com/chai/chai.js"></script>
-        <script src="https://unpkg.com/mocha/mocha.js"></script>
-    -->
     <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
     <script src="../dist/useeio-api.js"></script>
 
     <script class="mocha-init">
+        
       mocha.setup('bdd');
-      // mocha.checkLeaks();
+      mocha.checkLeaks();
     </script>
-    <!--
 
-        <script src="test.array.js"></script>
-        <script src="test.object.js"></script>
-    -->
     <script src="test.get-model-infos.js"></script>
+
     <script class="mocha-exec">
       mocha.run();
     </script>

@@ -2,6 +2,6 @@
 
 describe("fetch model infos", () => {
     it("should get model infos", () => {
-      assert.ok(true);
+      chai.assert.ok(true);
     })
 })
