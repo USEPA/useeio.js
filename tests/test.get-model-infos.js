@@ -1,7 +1,8 @@
-/// <reference path="../dist/webapi.d.ts" />
+describe("basic API requests", () => {
 
-describe("fetch model infos", () => {
-    it("should get model infos", () => {
-      chai.assert.ok(true);
-    })
-})
+  it("get model infos", async () => {
+    const modelInfos = await webApi.getModelInfos();
+    chai.assert.isTrue(modelInfos.length > 0);
+  });
+
+});
