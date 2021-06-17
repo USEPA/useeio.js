@@ -59,6 +59,22 @@ describe("model requests", () => {
       });
     });
   });
+
+  it("WebModel.demand", async () => {
+    await eachModel(async model => {
+      const demandInfos = await model.demands();
+      for (const info of demandInfos) {
+        var demand = await model.demand(info.id);
+        chai.assert.isTrue(demand.length > 0);
+        for (const entry of demand) {
+          chai.assert.isString(entry.sector);
+          chai.assert.isNumber(entry.amount);
+        }
+      }
+      console.log(`checked ${demandInfos.length} demand vectors in` +
+        ` model ${model.id()}`);
+    });
+  });
 });
 
 /**
