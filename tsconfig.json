@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
-    "target": "ES6",
-    "module": "None",
+    "target": "es5",
+    "lib": ["es2017", "es7", "es6", "dom"],
+    "module": "UMD",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "outFile": "./dist/useeio.api.js",
+    //"outFile": "./dist/useeio.api.umd.js",
     "outDir": "./dist",
     "strict": true,
     "esModuleInterop": true,
