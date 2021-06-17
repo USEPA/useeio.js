@@ -1,5 +1,14 @@
 import { Matrix } from './matrix';
-import { CalculationSetup, DemandEntry, DemandInfo, Indicator, MatrixName, ModelInfo, Result, Sector } from './model';
+import {
+    CalculationSetup,
+    DemandEntry,
+    DemandInfo,
+    Indicator,
+    MatrixName,
+    ModelInfo,
+    Result,
+    Sector,
+} from './model';
 
 /**
  * This module contains the functions and type definitions for accessing an
@@ -50,42 +59,19 @@ export class WebApi {
     /**
      * Creates a new instance based on the given configuration.
      */
-    constructor(private config: WebApiConfig) {
-        if (!config || !config.endpoint) {
+    constructor(private _config: WebApiConfig) {
+        if (!_config || !_config.endpoint) {
             throw new Error('invalid endpoint');
         }
-        let endpoint = config.endpoint;
+        let endpoint = _config.endpoint;
         if (!endpoint.endsWith("/")) {
             endpoint += "/";
         }
         this._endpoint = endpoint;
     }
 
-    /**
-     * Returns the full path to a resource target of this API endpoint.
-     * 
-     * @param path the path segments of the resource (e.g. `'modelv2', 'sectors'`)
-     * @returns the full path of the resource target (e.g.
-     * `http://localhost/api/modelv2/sectors`)
-     */
-    target(...path: string[]): string {
-        if (!path) {
-            return this._endpoint;
-        }
-        let target = this._endpoint;
-        for (const p of path) {
-            if (!p) {
-                continue;
-            }
-            if (!target.endsWith("/")) {
-                target += "/";
-            }
-            target += p;
-        }
-        if (this.config.asJsonFiles) {
-            target += ".json";
-        }
-        return target;
+    isJsonDump(): boolean {
+        return this._config.asJsonFiles === true;
     }
 
     /**
@@ -95,47 +81,26 @@ export class WebApi {
      * as a prefix to the request path.
      */
     async getModelInfos(): Promise<ModelInfo[]> {
-        return this._get(this.target("models"));
+        return this.get("models");
     }
 
     /**
-     * Performs a `get` request on a model. The given path should be the
-     * fragment after the model ID, e.g. `/sectors`.
+     * Performs a `get` request on this API endpoint for the given path.
+     * 
+     * @param path the path segments of the request
+     * @returns a promise of the requested resource
      */
-    async get<T>(path: string): Promise<T> {
-        let url = `${this.config.endpoint}/${this.config.model}${path}`;
-        if (this.config.asJsonFiles) {
-            url += ".json";
+    async get<T>(...path: string[]): Promise<T> {
+
+        // construct the URL
+        let url = this._target(...path);
+        if (this._config.asJsonFiles) {
+            if (!url.endsWith(".csv") && !url.endsWith(".json")) {
+                url += ".json";
+            }
         }
-        return this._get(url);
-    }
 
-    /**
-     * Performs a `post` with the given data on the given path, e.g.
-     * `/calculate`.
-     */
-    async post<T>(path: string, data: any): Promise<T> {
-        const url = `${this.config.endpoint}/${this.config.model}${path}`;
-        const req = this._request("POST", url);
-        return new Promise<T>((resolve, reject) => {
-            req.onload = () => {
-                if (req.status === 200) {
-                    try {
-                        const t: T = JSON.parse(req.responseText);
-                        resolve(t);
-                    } catch (err) {
-                        reject("failed to parse response for POST "
-                            + url + ": " + err);
-                    }
-                } else {
-                    reject(`request POST ${url} failed: ${req.statusText}`);
-                }
-            };
-            req.send(JSON.stringify(data));
-        });
-    }
-
-    private async _get<T>(url: string): Promise<T> {
+        // perform the request
         const req = this._request("GET", url);
         return new Promise<T>((resolve, reject) => {
             req.onload = () => {
@@ -155,15 +120,64 @@ export class WebApi {
         });
     }
 
+    /**
+     * Performs a `post` with the given data on the given path, e.g.
+     * `/calculate`.
+     */
+    async post<T>(data: any, ...path: string[]): Promise<T> {
+        const url = this._target(...path);
+        const req = this._request("POST", url);
+        return new Promise<T>((resolve, reject) => {
+            req.onload = () => {
+                if (req.status === 200) {
+                    try {
+                        const t: T = JSON.parse(req.responseText);
+                        resolve(t);
+                    } catch (err) {
+                        reject("failed to parse response for POST "
+                            + url + ": " + err);
+                    }
+                } else {
+                    reject(`request POST ${url} failed: ${req.statusText}`);
+                }
+            };
+            req.send(JSON.stringify(data));
+        });
+    }
+
+    /**
+     * Returns the full path to a resource target of this API endpoint.
+     * 
+     * @param path the path segments of the resource (e.g. `'modelv2', 'sectors'`)
+     * @returns the full path of the resource target (e.g.
+     * `http://localhost/api/modelv2/sectors`)
+     */
+    private _target(...path: string[]): string {
+        if (!path) {
+            return this._endpoint;
+        }
+        let target = this._endpoint;
+        for (const p of path) {
+            if (!p) {
+                continue;
+            }
+            if (!target.endsWith("/")) {
+                target += "/";
+            }
+            target += p;
+        }
+        return target;
+    }
+
     private _request(method: "GET" | "POST", url: string): XMLHttpRequest {
         const req = new XMLHttpRequest();
         req.open(method, url);
         req.setRequestHeader(
             "Content-Type",
             "application/json;charset=UTF-8");
-        if (this.config.apikey) {
+        if (this._config.apikey) {
             req.setRequestHeader(
-                "x-api-key", this.config.apikey);
+                "x-api-key", this._config.apikey);
         }
         return req;
     }
@@ -208,7 +222,7 @@ export class WebModel {
     private _isMultiRegional?: boolean;
     private _sectorAggregation?: SectorAggregation;
 
-    constructor(private api: WebApiConfig, private readonly modelID: string) {
+    constructor(private api: WebApi, private readonly modelId: string) {
         this._matrices = {};
         this._demands = {};
         this._totalResults = {};
@@ -219,7 +233,7 @@ export class WebModel {
      */
     async sectors(): Promise<Sector[]> {
         if (!this._sectors) {
-            this._sectors = await this._api.get("/sectors");
+            this._sectors = await this.api.get(this.modelId, "sectors");
         }
         return this._sectors || [];
     }
@@ -256,7 +270,7 @@ export class WebModel {
      */
     async indicators(): Promise<Indicator[]> {
         if (!this._indicators) {
-            this._indicators = await this._api.get("/indicators");
+            this._indicators = await this.api.get(this.modelId, "indicators");
         }
         return this._indicators || [];
     }
@@ -267,7 +281,7 @@ export class WebModel {
      */
     async demands(): Promise<DemandInfo[]> {
         if (!this._demandInfos) {
-            this._demandInfos = await this._api.get("/demands");
+            this._demandInfos = await this.api.get(this.modelId, "demands");
         }
         return this._demandInfos || [];
     }
@@ -280,7 +294,7 @@ export class WebModel {
         if (d) {
             return d;
         }
-        d = await this._api.get(`/demands/${id}`);
+        d = await this.api.get(this.modelId, "demands", id);
         this._demands[id] = d;
         return d;
     }
@@ -322,7 +336,7 @@ export class WebModel {
         if (m) {
             return m;
         }
-        const data: number[][] = await this._api.get(`/matrix/${name}`);
+        const data: number[][] = await this.api.get(this.modelId, "matrix", name);
         m = new Matrix(data);
         this._matrices[name] = m;
         return m;
@@ -332,8 +346,8 @@ export class WebModel {
      * Get the column of the matrix with the given name from the model.
      */
     async column(matrix: MatrixName, index: number): Promise<number[]> {
-        if (!this._conf.asJsonFiles) {
-            return this._api.get(`/matrix/${matrix}?col=${index}`);
+        if (!this.api.isJsonDump()) {
+            return this.api.get(this.modelId, "matrix", `${matrix}?col=${index}`);
         }
         const m = await this.matrix(matrix);
         return m.getCol(index);
@@ -346,8 +360,8 @@ export class WebModel {
      * data.
      */
     async calculate(setup: CalculationSetup): Promise<Result> {
-        if (!this._conf.asJsonFiles) {
-            return this._api.post("/calculate", setup);
+        if (!this.api.isJsonDump()) {
+            return this.api.post(setup, this.modelId, "calculate");
         }
 
         // try to run the calculation on JSON files
