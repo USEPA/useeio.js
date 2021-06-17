@@ -76,7 +76,7 @@ export interface ModelInfo {
     /**
      * The regional scope of the model.
      */
-    location: string;
+    location?: string;
 
     /**
      * An optional model description.

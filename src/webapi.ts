@@ -228,6 +228,10 @@ export class WebModel {
         this._totalResults = {};
     }
 
+    id(): string {
+        return this.modelId;
+    }
+
     /**
      * Returns the sectors of the USEEIO model.
      */
