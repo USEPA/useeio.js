@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "clean": "tsc --build --clean"
+    "build": "webpack --config webpack.config.js --mode=production",
+    "clean": "node scripts/clean"
   },
   "keywords": [],
   "author": "",
