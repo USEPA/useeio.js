@@ -13,7 +13,7 @@ import { CalculationSetup, DemandEntry, DemandInfo, Indicator, MatrixName, Model
  * An instance of this type contains the configuration of an [USEEIO
  * API](https://github.com/USEPA/USEEIO_API) endpoint.
  */
- export interface WebApiConfig {
+export interface WebApiConfig {
 
     /**
      * The enpoint URL of the USEEIO API, e.g. `https://path.to/useeio/api`.
@@ -21,12 +21,6 @@ import { CalculationSetup, DemandEntry, DemandInfo, Indicator, MatrixName, Model
      * the same server, e.g. `./api`.
      */
     endpoint: string;
-
-    /**
-     * The ID of the input-output model that should be used (an API endpoint
-     * can host multiple models which are identified by an unique ID).
-     */
-    model: string;
 
     /**
      * An optional API key if such a key is required to access the data of the
@@ -51,10 +45,48 @@ import { CalculationSetup, DemandEntry, DemandInfo, Indicator, MatrixName, Model
  */
 export class WebApi {
 
+    private readonly _endpoint;
+
     /**
      * Creates a new instance based on the given configuration.
      */
-    constructor(private conf: WebApiConfig) { }
+    constructor(private config: WebApiConfig) {
+        if (!config || !config.endpoint) {
+            throw new Error('invalid endpoint');
+        }
+        let endpoint = config.endpoint;
+        if (!endpoint.endsWith("/")) {
+            endpoint += "/";
+        }
+        this._endpoint = endpoint;
+    }
+
+    /**
+     * Returns the full path to a resource target of this API endpoint.
+     * 
+     * @param path the path segments of the resource (e.g. `'modelv2', 'sectors'`)
+     * @returns the full path of the resource target (e.g.
+     * `http://localhost/api/modelv2/sectors`)
+     */
+    target(...path: string[]): string {
+        if (!path) {
+            return this._endpoint;
+        }
+        let target = this._endpoint;
+        for (const p of path) {
+            if (!p) {
+                continue;
+            }
+            if (!target.endsWith("/")) {
+                target += "/";
+            }
+            target += p;
+        }
+        if (this.config.asJsonFiles) {
+            target += ".json";
+        }
+        return target;
+    }
 
     /**
      * Returns information about the available models of this API endpoint. This
@@ -63,11 +95,7 @@ export class WebApi {
      * as a prefix to the request path.
      */
     async getModelInfos(): Promise<ModelInfo[]> {
-        let url = `${this.conf.endpoint}/models`;
-        if (this.conf.asJsonFiles) {
-            url += ".json";
-        }
-        return this._get(url);
+        return this._get(this.target("models"));
     }
 
     /**
@@ -75,8 +103,8 @@ export class WebApi {
      * fragment after the model ID, e.g. `/sectors`.
      */
     async get<T>(path: string): Promise<T> {
-        let url = `${this.conf.endpoint}/${this.conf.model}${path}`;
-        if (this.conf.asJsonFiles) {
+        let url = `${this.config.endpoint}/${this.config.model}${path}`;
+        if (this.config.asJsonFiles) {
             url += ".json";
         }
         return this._get(url);
@@ -87,7 +115,7 @@ export class WebApi {
      * `/calculate`.
      */
     async post<T>(path: string, data: any): Promise<T> {
-        const url = `${this.conf.endpoint}/${this.conf.model}${path}`;
+        const url = `${this.config.endpoint}/${this.config.model}${path}`;
         const req = this._request("POST", url);
         return new Promise<T>((resolve, reject) => {
             req.onload = () => {
@@ -133,9 +161,9 @@ export class WebApi {
         req.setRequestHeader(
             "Content-Type",
             "application/json;charset=UTF-8");
-        if (this.conf.apikey) {
+        if (this.config.apikey) {
             req.setRequestHeader(
-                "x-api-key", this.conf.apikey);
+                "x-api-key", this.config.apikey);
         }
         return req;
     }
@@ -169,9 +197,7 @@ type SectorAggregation = {
  * Different widgets that access the same web-API should use the same `Model`
  * instance for efficiency reasons.
  */
-export class Model {
-
-    private _api: WebApi;
+export class WebModel {
 
     private _sectors?: Sector[];
     private _indicators?: Indicator[];
@@ -182,8 +208,7 @@ export class Model {
     private _isMultiRegional?: boolean;
     private _sectorAggregation?: SectorAggregation;
 
-    constructor(private _conf: WebApiConfig) {
-        this._api = new WebApi(_conf);
+    constructor(private api: WebApiConfig, private readonly modelID: string) {
         this._matrices = {};
         this._demands = {};
         this._totalResults = {};
