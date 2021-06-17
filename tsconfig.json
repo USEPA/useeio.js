@@ -3,14 +3,13 @@
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
     "target": "es5",
     "lib": ["es2017", "es7", "es6", "dom"],
-    "module": "UMD",
+    "module": "AMD",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    //"outFile": "./dist/useeio.api.umd.js",
+    "outFile": "./dist/useeio.api.js",
     "outDir": "./dist",
     "strict": true,
-    "esModuleInterop": true,
     "sourceRoot": "./src",
   }
 }
