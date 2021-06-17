@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig.json to read more about this file */
+    "target": "ES6",
+    "module": "None",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outFile": "./dist/useeio.api.js",
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "sourceRoot": "./src",
+  }
+}
