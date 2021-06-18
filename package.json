@@ -2,14 +2,20 @@
   "name": "useeio-js-api",
   "version": "1.0.0",
   "description": "",
+  "license": "CC0-1.0",
   "main": "index.js",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "index.js",
+    "dist/"
+  ],
   "scripts": {
     "build": "webpack --config webpack.config.js --mode=production",
     "clean": "node scripts/clean"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
   "devDependencies": {
     "chai": "^4.3.4",
     "mocha": "^9.0.0",

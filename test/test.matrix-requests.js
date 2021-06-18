@@ -36,20 +36,19 @@ describe("matrix requests", async function () {
     })
   });
 
-
+  it("Matrix.getRow", async () => {
+    console.log("check matrix rows of models");
+    await eachMatrix((model, name, matrix) => {
+      console.log(`  - check rows of matrix ${name} in model ${model.id}`);
+      for (let i = 0; i < matrix.rows; i++) {
+        const row = matrix.getRow(i);
+        for (let j = 0; j < matrix.cols; j++) {
+          chai.expect(matrix.get(i, j)).equals(row[j]);
+        }
+      }
+    })
+  });
 });
-
-
-/**
- * @param {(model: WebModel) => void} fn the model callback
- */
-async function eachModel(fn) {
-  for (const info of await webApi.getModelInfos()) {
-    /** @type WebModel */
-    const model = new useeio.WebModel(webApi, info.id);
-    fn(model);
-  }
-}
 
 /**
  * Iterates over each matrix in each of the available models. 

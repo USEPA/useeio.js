@@ -1,16 +1,8 @@
 const path = require('path');
 
-module.exports = {
+const baseConfig = {
   entry: {
     'useeio-api': './src/webapi.ts',
-  },
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: '[name].js',
-    libraryTarget: 'umd',
-    library: 'useeio',
-    umdNamedDefine: true,
-    //globalObject: 'this',
   },
   resolve: {
     extensions: ['.tsx', '.ts', '.js']
@@ -25,5 +17,28 @@ module.exports = {
       },
     ]
   },
-  
 };
+
+const umpConfig = {
+  ...baseConfig,
+  output: {
+    path: path.resolve(__dirname, 'dist/umd'),
+    filename: '[name].js',
+    libraryTarget: 'umd',
+    library: 'useeio',
+    umdNamedDefine: true,
+    //globalObject: 'this',
+  },
+}
+
+const cjsConfig = {
+  ...baseConfig,
+  output: {
+    path: path.resolve(__dirname, 'dist/cjs'),
+    filename: '[name].js',
+    libraryTarget: 'commonjs',
+    //globalObject: 'this',
+  },
+}
+
+module.exports = [ umpConfig, cjsConfig ];
