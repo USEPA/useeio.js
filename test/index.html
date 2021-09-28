@@ -12,19 +12,21 @@
   <div id="mocha"></div>
   <script src="../node_modules/mocha/mocha.js"></script>
   <script src="../node_modules/chai/chai.js"></script>
-  <script src="../dist/umd/useeio-api.js"></script>
+  <script src="../dist/USEEIO.umd.js"></script>
 
   <script class="mocha-init">
     var assert = chai.assert;
     var expect = chai.expect;
-    var webApi = new useeio.WebApi({
+    var webApi = new USEEIO.WebApi({
       endpoint: 'http://localhost/api',
     });
     mocha.setup('bdd');
   </script>
 
+<!--
   <script src="test.model-requests.js"></script>
   <script src="test.matrix-requests.js"></script>
+-->
 
   <script class="mocha-exec">
     mocha.run();

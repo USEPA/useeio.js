@@ -1,13 +1,3 @@
-/** @typedef {import("../dist/webapi").WebApi} WebApi */
-/** @typedef {import("../dist/webapi").WebModel} WebModel */
-/** @typedef {import("../dist/model").MatrixName} MatrixName */
-/** @typedef {import("../dist/model").ModelInfo} ModelInfo */
-/** @typedef {import("../dist/matrix").Matrix} Matrix */
-
-
-/** @type WebApi */
-var webApi = webApi;
-
 describe("matrix requests", async function () {
   this.timeout(10000);
 

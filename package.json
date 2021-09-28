@@ -1,15 +1,15 @@
 {
-  "name": "useeio-js-api",
-  "version": "1.0.0",
+  "name": "useeio.js",
+  "version": "0.0.1",
   "description": "",
   "license": "CC0-1.0",
-  "main": "index.js",
-  "types": "./index.d.ts",
+  "main": "dist/USEEIO.umd.js",
+  "types": "dist/USEEIO.d.ts",
   "files": [
     "LICENSE",
     "README.md",
-    "index.js",
-    "dist/"
+    "dist",
+    "src"    
   ],
   "scripts": {
     "clean": "node scripts/clean",
