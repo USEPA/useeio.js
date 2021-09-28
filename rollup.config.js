@@ -1,10 +1,10 @@
 import typescript from 'rollup-plugin-typescript2';
 
 export default {
-	input: 'src/index.ts',
+	input: 'src/USEEIO.ts',
   output: [
     {
-      file: 'dist/useeio.umd.js',
+      file: 'dist/USEEIO.umd.js',
       format: 'umd',
       name: 'USEEIO'
     }
