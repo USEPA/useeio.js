@@ -1,3 +1,10 @@
+/// <reference types="../dist/USEEIO" />
+/** @type {import('USEEIO')} */
+var USEEIO = USEEIO;
+/** @type {import('USEEIO').WebApi} */
+var webApi = webApi;
+
+
 describe("model requests", () => {
 
   it("WebApi.getModelInfos", async () => {
