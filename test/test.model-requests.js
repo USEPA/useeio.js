@@ -1,10 +1,3 @@
-/** @typedef {import("../dist/webapi").WebApi} WebApi */
-/** @typedef {import("../dist/webapi").WebModel} WebModel */
-
-/** @type WebApi */
-var webApi = webApi;
-
-
 describe("model requests", () => {
 
   it("WebApi.getModelInfos", async () => {

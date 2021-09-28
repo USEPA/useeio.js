@@ -7,15 +7,14 @@
   "types": "dist/USEEIO.d.ts",
   "files": [
     "LICENSE",
-    "README.md",
-    "dist",
-    "src"    
+    "dist"
   ],
   "scripts": {
     "clean": "node scripts/clean",
     "build:js": "npx rollup -c rollup.config.js",
     "build:types": "tsc -t esnext --module umd --moduleResolution node -d --emitDeclarationOnly --outFile dist/USEEIO.d.ts src/USEEIO.ts",
-    "build": "npm run clean -s && npm run build:js -s && npm run build:types -s"
+    "build:minjs": "npx terser dist/USEEIO.umd.js --compress --mangle -o dist/USEEIO.umd.min.js",
+    "build": "npm run clean -s && npm run build:js -s && npm run build:types -s && npm run build:minjs -s"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +23,7 @@
     "mocha": "^9.0.0",
     "rollup": "^2.57.0",
     "rollup-plugin-typescript2": "^0.30.0",
+    "terser": "^5.9.0",
     "tslib": "^2.3.1",
     "typescript": "^4.4.3"
   }
