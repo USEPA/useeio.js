@@ -1,19 +1,17 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
+    "module": "ESNext",
     "target": "es5",
     "lib": [
       "es2015",
       "dom"
     ],
-    "outDir": "./dist/types",
-    "sourceMap": true,
-    "declaration": true,
-    "esModuleInterop": true,
+    "outDir": "./dist",
     "strict": true,
+    "noFallthroughCasesInSwitch": true,
   },
   "include": [
-    "src/**/*"
+    "src/index.ts"
   ],
   "exclude": [
     "dist",
