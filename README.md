@@ -22,3 +22,23 @@ Then, in the project where you want to use it:
 ```
 $ npm install {some folder}/useeio.js
 ```
+
+## Dump API data locally
+
+```
+$ node scripts\dumpjson.js --endpoint {URL}
+```
+
+https://smmtool.app.cloud.gov/api
+
+```
+$ python3 -m http.server --directory data 8080
+```
+
+```bash
+# 
+npm install http-server -g
+
+http-server ./data -p 8080 --cors
+
+```

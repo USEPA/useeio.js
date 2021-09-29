@@ -18,14 +18,15 @@
     var assert = chai.assert;
     var expect = chai.expect;
     var webApi = new USEEIO.WebApi({
-      endpoint: 'http://localhost/api',
+      endpoint: 'http://localhost:8080/api',
+      asJsonFiles: true,
     });
     mocha.setup('bdd');
   </script>
 
+<script src="test.model-requests.js"></script>
+<script src="test.matrix-requests.js"></script>
 <!--
-  <script src="test.model-requests.js"></script>
-  <script src="test.matrix-requests.js"></script>
 -->
 
   <script class="mocha-exec">
