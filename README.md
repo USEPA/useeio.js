@@ -6,6 +6,7 @@ written in TypeScript and uses [rollup.js](https://rollupjs.org) with the
 to create a single UMD bundle; [terser](https://terser.org/) is then used
 to create a minified bundle.
 
+
 ## Usage
 
 `useeio.js` is not on `npmjs.org` yet but you can just install it from Github
@@ -15,6 +16,8 @@ directly:
 $ npm install git+https://github.com/msrocka/useeio.js.git
 ```
 
+Alternatively, you can download and bzuld it locally:
+
 ```bash
 $ cd {some folder}
 $ git clone https://github.com/msrocka/useeio.js.git
@@ -22,25 +25,24 @@ $ cd useeio.js
 $ npm run build
 ```
 
-Then, in the project where you want to use it:
-
 
 ## Dump API data locally
+This project contains a script for downloading a JSON dump of an USEEIO-API
+instance:
 
 ```
 $ node scripts\dumpjson.js --endpoint {URL}
 ```
 
-https://smmtool.app.cloud.gov/api
+Where `{URL}` is some API endpoint, like https://smmtool.app.cloud.gov/api. You
+can then host the dump locally, e.g. via
+[htpp-server](https://www.npmjs.com/package/http-server):
 
-```
-$ python3 -m http.server --directory data 8080
-```
 
 ```bash
-# 
+# just install it once, globally
 npm install http-server -g
 
+# host the data folder on port 8080, allowing CORS
 http-server ./data -p 8080 --cors
-
 ```

@@ -273,6 +273,11 @@ declare module "webapi" {
          */
         endpoint: string;
         /**
+         * The ID of the input-output model that should be used (an API endpoint
+         * can host multiple models which are identified by an unique ID).
+         */
+        model?: string;
+        /**
          * An optional API key if such a key is required to access the data of the
          * API endpoint.
          */
@@ -285,6 +290,9 @@ declare module "webapi" {
          */
         asJsonFiles?: boolean;
     }
+    export function modelOf(config: WebApiConfig & {
+        model: string;
+    }): WebModel;
     /**
      * A class for low level web API calls. The widgets should typically use an
      * instance of the `Model` class for accessing the web API instead as it

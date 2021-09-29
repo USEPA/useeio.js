@@ -167,6 +167,10 @@
         }
     }
 
+    function modelOf(config) {
+        var api = new WebApi(config);
+        return new WebModel(api, config.model);
+    }
     /**
      * A class for low level web API calls. The widgets should typically use an
      * instance of the `Model` class for accessing the web API instead as it
@@ -711,6 +715,7 @@
     exports.Matrix = Matrix;
     exports.WebApi = WebApi;
     exports.WebModel = WebModel;
+    exports.modelOf = modelOf;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
