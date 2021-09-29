@@ -11,7 +11,7 @@
     "noFallthroughCasesInSwitch": true,
   },
   "include": [
-    "src/USEEIO.ts"
+    "src/useeio.ts"
   ],
   "exclude": [
     "dist",

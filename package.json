@@ -1,10 +1,10 @@
 {
-  "name": "useeio.js",
+  "name": "useeio",
   "version": "0.0.1",
   "description": "",
   "license": "CC0-1.0",
-  "main": "dist/USEEIO.umd.js",
-  "types": "dist/USEEIO.d.ts",
+  "main": "dist/useeio.js",
+  "types": "dist/useeio.d.ts",
   "files": [
     "LICENSE",
     "dist"
@@ -12,8 +12,8 @@
   "scripts": {
     "clean": "node scripts/clean",
     "build:js": "npx rollup -c rollup.config.js",
-    "build:types": "tsc -t esnext --module umd --moduleResolution node -d --emitDeclarationOnly --outFile dist/USEEIO.d.ts src/USEEIO.ts",
-    "build:minjs": "npx terser dist/USEEIO.umd.js --compress --mangle -o dist/USEEIO.umd.min.js",
+    "build:types": "tsc -t esnext --module umd --moduleResolution node -d --emitDeclarationOnly --outFile dist/useeio.d.ts src/useeio.ts",
+    "build:minjs": "npx terser dist/useeio.js --compress --mangle -o dist/useeio.min.js",
     "build": "npm run clean -s && npm run build:js -s && npm run build:types -s && npm run build:minjs -s"
   },
   "keywords": [],

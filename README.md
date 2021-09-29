@@ -6,9 +6,14 @@ written in TypeScript and uses [rollup.js](https://rollupjs.org) with the
 to create a single UMD bundle; [terser](https://terser.org/) is then used
 to create a minified bundle.
 
-## Build and usage
-`useeio.js` is not on `npmjs.org` yet. In order to use it currently, you need
-to build and install it locally:
+## Usage
+
+`useeio.js` is not on `npmjs.org` yet but you can just install it from Github
+directly:
+
+```
+$ npm install git+https://github.com/msrocka/useeio.js.git
+```
 
 ```bash
 $ cd {some folder}
@@ -19,9 +24,6 @@ $ npm run build
 
 Then, in the project where you want to use it:
 
-```
-$ npm install {some folder}/useeio.js
-```
 
 ## Dump API data locally
 

@@ -422,7 +422,7 @@ declare module "webapi" {
         singleRegionSectors(): Promise<SectorAggregation>;
     }
 }
-declare module "USEEIO" {
+declare module "useeio" {
     export * from "matrix";
     export * from "model";
     export * from "webapi";
