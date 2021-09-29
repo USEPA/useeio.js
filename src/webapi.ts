@@ -32,6 +32,12 @@ export interface WebApiConfig {
     endpoint: string;
 
     /**
+     * The ID of the input-output model that should be used (an API endpoint
+     * can host multiple models which are identified by an unique ID).
+     */
+    model?: string;
+
+    /**
      * An optional API key if such a key is required to access the data of the
      * API endpoint.
      */
@@ -45,6 +51,11 @@ export interface WebApiConfig {
      */
     asJsonFiles?: boolean;
 
+}
+
+export function modelOf(config: WebApiConfig & { model: string }) {
+    const api = new WebApi(config);
+    return new WebModel(api, config.model);
 }
 
 /**
