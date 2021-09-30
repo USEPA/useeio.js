@@ -2,37 +2,49 @@
 <html>
 
 <head>
-    <meta charset='utf-8'>
-    <title>Commodity Vector Example</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <script src='../dist/useeio.js'></script>
-    <style>
-        * {
-            font-family: 'Ubuntu Mono', 'Courier New', monospace;
-            font-size: 22px;
-        }
+  <meta charset='utf-8'>
+  <title>Commodity Vector Example</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <script src='../dist/useeio.js'></script>
+  <style>
+    * {
+      font-family: 'Ubuntu Mono', 'Courier New', monospace;
+      font-size: 22px;
+    }
 
-        body {
-            margin: 25px;
-        }
-    </style>
+    body {
+      margin: 25px;
+    }
+  </style>
 </head>
 
 <body>
 
-    <p>
-        This example loads the commodity vector q from the API and then
-        calculates the upstream direct requirements, direct impacts, and
-        direct downstream monetary flows related to this vector.
-    </p>
+  <p>
+    This example loads the commodity vector q from the API and then
+    calculates the upstream direct requirements, direct impacts, and
+    direct downstream monetary flows related to this vector.
+  </p>
 
-    <script>
-        const model = useeio.modelOf({
-            endpoint: 'http://localhost:8080/api',
-            model: 'USEEIOv2.0',
-            asJsonFiles: true,
-        });
-    </script>
+  <script>
+    const model = useeio.modelOf({
+      endpoint: 'http://localhost:8080/api',
+      model: 'USEEIOv2.0',
+      asJsonFiles: true,
+    });
+
+    async function main() {
+      const q = await model.matrix('q');
+      const impacts = await useeio.CommodityVector.directImpactsOf(model, q);
+      console.log(impacts.length);
+      const upstreams = await useeio.CommodityVector.directRequirementsOf(model, q);
+      console.log(upstreams.length);
+      const downstreams = await useeio.CommodityVector.directDownstreamsOf(model, q);
+      console.log(downstreams.length);
+    }
+    main();
+
+  </script>
 
 </body>
 

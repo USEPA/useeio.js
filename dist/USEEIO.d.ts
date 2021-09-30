@@ -249,7 +249,7 @@ declare module "model" {
      * The currently supported matrices, see:
      * https://github.com/USEPA/USEEIO_API/blob/master/doc/data_format.md
      */
-    export type MatrixName = "A" | "B" | "C" | "D" | "L" | "N";
+    export type MatrixName = "A" | "A_d" | "B" | "C" | "D" | "L" | "L_d" | "M" | "M_d" | "N" | "N_d" | "Phi" | "q" | "Rho" | "U" | "U_d" | "V" | "x";
 }
 declare module "webapi" {
     import { Matrix } from "matrix";
@@ -430,7 +430,20 @@ declare module "webapi" {
         singleRegionSectors(): Promise<SectorAggregation>;
     }
 }
+declare module "calc" {
+    import { Matrix } from "matrix";
+    import { WebModel } from "webapi";
+    export function zeros(len: number): number[];
+    export function ones(len: number): number[];
+    export function max(xs: number[]): number;
+    export class CommodityVector {
+        static directImpactsOf(model: WebModel, vector: Matrix | number[]): Promise<number[]>;
+        static directRequirementsOf(model: WebModel, vector: Matrix | number[]): Promise<number[]>;
+        static directDownstreamsOf(model: WebModel, vector: Matrix | number[]): Promise<number[]>;
+    }
+}
 declare module "useeio" {
+    export * from "calc";
     export * from "matrix";
     export * from "model";
     export * from "webapi";
