@@ -1,7 +1,8 @@
 const fs = require('fs');
 
-let endpoint = null;
+let endpoint = 'http://localhost/api';
 let apikey = null;
+let calculate = false;
 let args = {};
 
 // parse command line arguments
@@ -23,6 +24,9 @@ for (const arg of process.argv) {
     case '--apikey':
       apikey = arg;
       break;
+    case '--calculate':
+      calculate = arg.toLowerCase() == 'true';
+      break;
     default:
       args[flag.substring(2)] = arg;
       break;
@@ -30,13 +34,10 @@ for (const arg of process.argv) {
   flag = null;
 }
 
-if (!endpoint) {
-  endpoint = 'http://localhost/api';
-  console.log('No endpoint set; use default: ' + endpoint);
-}
 if (endpoint.endsWith('/')) {
   endpoint = endpoint.substring(0, endpoint.length - 1);
 }
+console.log('fetch data from:', endpoint);
 if (!apikey) {
   console.log('No API key set; use none');
 }
@@ -144,9 +145,16 @@ async function download(modelID) {
 
   // download index and matrix files (non-blocking)
   const paths = ["/sectors", "/flows", "/indicators"];
-  ["A", "B", "C", "D", "L", "N"].forEach((matrix) => {
-    paths.push("/matrix/" + matrix);
-  });
+  const matrices = [
+    "A", "A_d", "B", "C", "D", "L",
+    "L_d", "M", "M_d", "N", "N_d",
+    "Phi", "q", "Rho", "U", "U_d",
+    "V", "x",
+  ];
+  for (const m of matrices) {
+    paths.push("/matrix/" + m);
+  }
+
   for (const path of paths) {
     fetch(`/${modelID}${path}`)
       .then((data) => {
@@ -169,6 +177,10 @@ async function download(modelID) {
         const file = `${dir}/demands/${demand.id}.json`;
         console.log("write file", file);
         fs.writeFile(file, data, () => { });
+
+        if (!calculate) {
+          return;
+        }
 
         // Calculate results for each demand vector / perspective
         const resultDir = `${dir}/results/`;

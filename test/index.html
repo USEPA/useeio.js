@@ -12,12 +12,12 @@
   <div id="mocha"></div>
   <script src="../node_modules/mocha/mocha.js"></script>
   <script src="../node_modules/chai/chai.js"></script>
-  <script src="../dist/USEEIO.umd.js"></script>
+  <script src="../dist/useeio.js"></script>
 
   <script class="mocha-init">
     var assert = chai.assert;
     var expect = chai.expect;
-    var webApi = new USEEIO.WebApi({
+    var webApi = new useeio.WebApi({
       endpoint: 'http://localhost:8080/api',
       asJsonFiles: true,
     });

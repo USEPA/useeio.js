@@ -236,8 +236,20 @@ export interface Result {
  */
 export type MatrixName =
     "A"
+    |"A_d"
     | "B"
     | "C"
     | "D"
     | "L"
-    | "N";
+    | "L_d"
+    | "M"
+    | "M_d"
+    | "N"
+    | "N_d"
+    | "Phi"
+    | "q"
+    | "Rho"
+    | "U"
+    | "U_d"
+    | "V"
+    | "x";
