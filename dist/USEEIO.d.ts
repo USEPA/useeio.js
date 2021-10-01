@@ -125,6 +125,8 @@ declare module "model" {
          * An optional model description.
          */
         description?: string;
+        hash?: string;
+        sectorschema?: string;
     }
     /**
      * Describes an industry sector in an USEEIO model.
@@ -250,10 +252,18 @@ declare module "model" {
      * https://github.com/USEPA/USEEIO_API/blob/master/doc/data_format.md
      */
     export type MatrixName = "A" | "A_d" | "B" | "C" | "D" | "L" | "L_d" | "M" | "M_d" | "N" | "N_d" | "Phi" | "q" | "Rho" | "U" | "U_d" | "V" | "x";
+    /**
+     * The sector crosswalk contains mappings between different sector
+     * classification schemes.
+     */
+    export interface SectorCrosswalk {
+        header: string[];
+        mappings: string[][];
+    }
 }
 declare module "webapi" {
     import { Matrix } from "matrix";
-    import { CalculationSetup, DemandEntry, DemandInfo, Indicator, MatrixName, ModelInfo, Result, Sector } from "model";
+    import { CalculationSetup, DemandEntry, DemandInfo, Indicator, MatrixName, ModelInfo, Result, Sector, SectorCrosswalk } from "model";
     /**
      * This module contains the functions and type definitions for accessing an
      * [USEEIO API](https://github.com/USEPA/USEEIO_API) endpoint. The widgets
@@ -314,12 +324,14 @@ declare module "webapi" {
          */
         getModelInfos(): Promise<ModelInfo[]>;
         /**
-         * Performs a `get` request on this API endpoint for the given path.
+         * Performs a `get` request on this API endpoint for the given path and
+         * returns the response as JSON.
          *
          * @param path the path segments of the request
          * @returns a promise of the requested resource
          */
-        get<T>(...path: string[]): Promise<T>;
+        getJson<T>(...path: string[]): Promise<T>;
+        getText(...path: string[]): Promise<string>;
         /**
          * Performs a `post` with the given data on the given path, e.g.
          * `/calculate`.
@@ -368,13 +380,16 @@ declare module "webapi" {
         private _sectors?;
         private _indicators?;
         private _demandInfos?;
-        private _matrices;
-        private _demands;
-        private _totalResults;
+        private readonly _matrices;
+        private readonly _demands;
+        private readonly _totalResults;
         private _isMultiRegional?;
         private _sectorAggregation?;
+        private _sectorCrosswalk?;
+        private _info?;
         constructor(api: WebApi, modelId: string);
         id(): string;
+        info(): Promise<ModelInfo | undefined>;
         /**
          * Returns the sectors of the USEEIO model.
          */
@@ -428,6 +443,7 @@ declare module "webapi" {
          * (which should be unique then).
          */
         singleRegionSectors(): Promise<SectorAggregation>;
+        sectorCrosswalk(): Promise<SectorCrosswalk>;
     }
 }
 declare module "calc" {
@@ -442,9 +458,25 @@ declare module "calc" {
         static directDownstreamsOf(model: WebModel, vector: Matrix | number[]): Promise<number[]>;
     }
 }
+declare module "sectors" {
+    import { WebModel } from "webapi";
+    export class NaicsMap {
+        private readonly _map;
+        private constructor();
+        static of(model: WebModel): Promise<NaicsMap>;
+        /**
+         * Maps the given NAICS codes to a list of corresponding BEA
+         * codes based on the underlying model-schema of this map.
+         *
+         * @param naics the NAICS codes that should be mapped.
+         */
+        toBea(naics: string | string[]): string[];
+    }
+}
 declare module "useeio" {
     export * from "calc";
     export * from "matrix";
     export * from "model";
+    export * from "sectors";
     export * from "webapi";
 }

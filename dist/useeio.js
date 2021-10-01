@@ -244,6 +244,110 @@
         IndicatorGroup["CHEMICAL_RELEASES"] = "Chemical Releases";
     })(exports.IndicatorGroup || (exports.IndicatorGroup = {}));
 
+    var NaicsMap = /** @class */ (function () {
+        function NaicsMap(_map) {
+            this._map = _map;
+        }
+        NaicsMap.of = function (model) {
+            var _a;
+            return __awaiter(this, void 0, void 0, function () {
+                var crosswalk, modelInfo, modelSchema, naicsCol, modelCol, i, header, map, minSize, _i, _b, mapping, naicsCode, beaCode, mapped;
+                return __generator(this, function (_c) {
+                    switch (_c.label) {
+                        case 0: return [4 /*yield*/, model.sectorCrosswalk()];
+                        case 1:
+                            crosswalk = _c.sent();
+                            if (!crosswalk
+                                || !crosswalk.header
+                                || crosswalk.header.length === 0
+                                || !crosswalk.mappings
+                                || crosswalk.mappings.length === 0) {
+                                return [2 /*return*/, new NaicsMap({})];
+                            }
+                            return [4 /*yield*/, model.info()];
+                        case 2:
+                            modelInfo = _c.sent();
+                            modelSchema = (_a = modelInfo === null || modelInfo === void 0 ? void 0 : modelInfo.sectorschema) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+                            naicsCol = -1;
+                            modelCol = -1;
+                            for (i = 0; i < crosswalk.header.length; i++) {
+                                if (naicsCol >= 0 && modelCol >= 0) {
+                                    break;
+                                }
+                                header = crosswalk.header[i].toLowerCase();
+                                if (header === "naics") {
+                                    naicsCol = i;
+                                    continue;
+                                }
+                                if (modelSchema && header == modelSchema) {
+                                    modelCol = i;
+                                    continue;
+                                }
+                                // if there is no model schema available we try to
+                                // map the BEA detail column
+                                if (!modelCol
+                                    && header.includes("bea")
+                                    && header.includes("detail")) {
+                                    modelCol = i;
+                                }
+                            }
+                            if (naicsCol < 0 || modelCol < 0) {
+                                return [2 /*return*/, new NaicsMap({})];
+                            }
+                            map = {};
+                            minSize = Math.max(naicsCol, modelCol) + 1;
+                            for (_i = 0, _b = crosswalk.mappings; _i < _b.length; _i++) {
+                                mapping = _b[_i];
+                                if (mapping.length < minSize) {
+                                    continue;
+                                }
+                                naicsCode = mapping[naicsCol].trim();
+                                beaCode = mapping[modelCol].trim();
+                                if (naicsCode.length == 0 || beaCode.length == 0) {
+                                    continue;
+                                }
+                                mapped = map[naicsCode];
+                                if (!mapped) {
+                                    map[naicsCode] = [beaCode];
+                                }
+                                else {
+                                    mapped.push(beaCode);
+                                }
+                            }
+                            return [2 /*return*/, new NaicsMap(map)];
+                    }
+                });
+            });
+        };
+        /**
+         * Maps the given NAICS codes to a list of corresponding BEA
+         * codes based on the underlying model-schema of this map.
+         *
+         * @param naics the NAICS codes that should be mapped.
+         */
+        NaicsMap.prototype.toBea = function (naics) {
+            if (!naics) {
+                return [];
+            }
+            var naicsCodes = naics instanceof Array
+                ? naics
+                : [naics];
+            var bea = {};
+            for (var _i = 0, naicsCodes_1 = naicsCodes; _i < naicsCodes_1.length; _i++) {
+                var naic = naicsCodes_1[_i];
+                var mapped = this._map[naic];
+                if (mapped) {
+                    for (var _a = 0, mapped_1 = mapped; _a < mapped_1.length; _a++) {
+                        var code = mapped_1[_a];
+                        bea[code] = true;
+                    }
+                }
+            }
+            return Object.keys(bea);
+        };
+        return NaicsMap;
+    }());
+
     function modelOf(config) {
         var api = new WebApi(config);
         return new WebModel(api, config.model);
@@ -280,17 +384,18 @@
         WebApi.prototype.getModelInfos = function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    return [2 /*return*/, this.get("models")];
+                    return [2 /*return*/, this.getJson("models")];
                 });
             });
         };
         /**
-         * Performs a `get` request on this API endpoint for the given path.
+         * Performs a `get` request on this API endpoint for the given path and
+         * returns the response as JSON.
          *
          * @param path the path segments of the request
          * @returns a promise of the requested resource
          */
-        WebApi.prototype.get = function () {
+        WebApi.prototype.getJson = function () {
             var path = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 path[_i] = arguments[_i];
@@ -300,7 +405,7 @@
                 return __generator(this, function (_a) {
                     url = this._target.apply(this, path);
                     if (this._config.asJsonFiles) {
-                        if (!url.endsWith(".csv") && !url.endsWith(".json")) {
+                        if (!url.endsWith(".json")) {
                             url += ".json";
                         }
                     }
@@ -311,6 +416,36 @@
                                     try {
                                         var t = JSON.parse(req.responseText);
                                         resolve(t);
+                                    }
+                                    catch (err) {
+                                        reject("failed to parse response for: "
+                                            + url + ": " + err);
+                                    }
+                                }
+                                else {
+                                    reject("request " + url + " failed: " + req.statusText);
+                                }
+                            };
+                            req.send();
+                        })];
+                });
+            });
+        };
+        WebApi.prototype.getText = function () {
+            var path = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                path[_i] = arguments[_i];
+            }
+            return __awaiter(this, void 0, void 0, function () {
+                var url, req;
+                return __generator(this, function (_a) {
+                    url = this._target.apply(this, path);
+                    req = this._request("GET", url);
+                    return [2 /*return*/, new Promise(function (resolve, reject) {
+                            req.onload = function () {
+                                if (req.status === 200) {
+                                    try {
+                                        resolve(req.responseText);
                                     }
                                     catch (err) {
                                         reject("failed to parse response for: "
@@ -417,6 +552,29 @@
         WebModel.prototype.id = function () {
             return this.modelId;
         };
+        WebModel.prototype.info = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var infos, _i, infos_1, info;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (!!this._info) return [3 /*break*/, 2];
+                            return [4 /*yield*/, this.api.getModelInfos()];
+                        case 1:
+                            infos = _a.sent();
+                            for (_i = 0, infos_1 = infos; _i < infos_1.length; _i++) {
+                                info = infos_1[_i];
+                                if (info.id == this.id()) {
+                                    this._info = info;
+                                    break;
+                                }
+                            }
+                            _a.label = 2;
+                        case 2: return [2 /*return*/, this._info];
+                    }
+                });
+            });
+        };
         /**
          * Returns the sectors of the USEEIO model.
          */
@@ -428,7 +586,7 @@
                         case 0:
                             if (!!this._sectors) return [3 /*break*/, 2];
                             _a = this;
-                            return [4 /*yield*/, this.api.get(this.modelId, "sectors")];
+                            return [4 /*yield*/, this.api.getJson(this.modelId, "sectors")];
                         case 1:
                             _a._sectors = _b.sent();
                             _b.label = 2;
@@ -484,7 +642,7 @@
                         case 0:
                             if (!!this._indicators) return [3 /*break*/, 2];
                             _a = this;
-                            return [4 /*yield*/, this.api.get(this.modelId, "indicators")];
+                            return [4 /*yield*/, this.api.getJson(this.modelId, "indicators")];
                         case 1:
                             _a._indicators = _b.sent();
                             _b.label = 2;
@@ -505,7 +663,7 @@
                         case 0:
                             if (!!this._demandInfos) return [3 /*break*/, 2];
                             _a = this;
-                            return [4 /*yield*/, this.api.get(this.modelId, "demands")];
+                            return [4 /*yield*/, this.api.getJson(this.modelId, "demands")];
                         case 1:
                             _a._demandInfos = _b.sent();
                             _b.label = 2;
@@ -527,7 +685,7 @@
                             if (d) {
                                 return [2 /*return*/, d];
                             }
-                            return [4 /*yield*/, this.api.get(this.modelId, "demands", id)];
+                            return [4 /*yield*/, this.api.getJson(this.modelId, "demands", id)];
                         case 1:
                             d = _a.sent();
                             this._demands[id] = d;
@@ -563,10 +721,7 @@
                                     return false;
                                 }
                                 */
-                                if (spec.year && d.year !== spec.year) {
-                                    return false;
-                                }
-                                return true;
+                                return !(spec.year && d.year !== spec.year);
                             });
                             return [2 /*return*/, demand ? demand.id : null];
                     }
@@ -586,7 +741,7 @@
                             if (m) {
                                 return [2 /*return*/, m];
                             }
-                            return [4 /*yield*/, this.api.get(this.modelId, "matrix", name)];
+                            return [4 /*yield*/, this.api.getJson(this.modelId, "matrix", name)];
                         case 1:
                             data = _a.sent();
                             m = new Matrix(data);
@@ -606,7 +761,7 @@
                     switch (_a.label) {
                         case 0:
                             if (!this.api.isJsonDump()) {
-                                return [2 /*return*/, this.api.get(this.modelId, "matrix", matrix + "?col=" + index)];
+                                return [2 /*return*/, this.api.getJson(this.modelId, "matrix", matrix + "?col=" + index)];
                             }
                             return [4 /*yield*/, this.matrix(matrix)];
                         case 1:
@@ -734,7 +889,7 @@
          */
         WebModel.prototype.singleRegionSectors = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var sectors, multiRegional, index, aggSectors, aggIndex, i, _i, sectors_2, s, agg;
+                var sectors, multiRegional, index, aggSectors, aggIndex, i, _i, sectors_2, s;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -766,14 +921,13 @@
                                 s = sectors_2[_i];
                                 if (aggIndex[s.code] === undefined) {
                                     aggIndex[s.code] = i;
-                                    agg = {
+                                    aggSectors[i] = {
                                         code: s.code,
                                         id: s.code,
                                         index: i,
                                         name: s.name,
                                         description: s.description,
                                     };
-                                    aggSectors[i] = agg;
                                     i++;
                                 }
                             }
@@ -786,11 +940,72 @@
                 });
             });
         };
+        WebModel.prototype.sectorCrosswalk = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var text, lines, parseLine, header, mappings, i;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (this._sectorCrosswalk) {
+                                return [2 /*return*/, this._sectorCrosswalk];
+                            }
+                            return [4 /*yield*/, this.api.getText("sectorcrosswalk.csv")];
+                        case 1:
+                            text = _a.sent();
+                            lines = text.split(/\r?\n/);
+                            if (lines.length == 0) {
+                                return [2 /*return*/, { header: [], mappings: [] }];
+                            }
+                            parseLine = function (line) {
+                                var feed = line.trim();
+                                var parsed = [];
+                                if (feed.length == 0) {
+                                    return parsed;
+                                }
+                                var inQuotes = false;
+                                var buffer = "";
+                                for (var i = 0; i < feed.length; i++) {
+                                    var c = feed.charAt(i);
+                                    if (inQuotes) {
+                                        if (c == '"') {
+                                            inQuotes = false;
+                                        }
+                                        else {
+                                            buffer += c;
+                                        }
+                                        continue;
+                                    }
+                                    if (c == '"') {
+                                        inQuotes = true;
+                                        continue;
+                                    }
+                                    if (c == ",") {
+                                        parsed.push(buffer);
+                                        buffer = "";
+                                        continue;
+                                    }
+                                    buffer += c;
+                                }
+                                parsed.push(buffer);
+                                return parsed;
+                            };
+                            header = parseLine(lines[0]);
+                            mappings = [];
+                            for (i = 1; i < lines.length; i++) {
+                                mappings.push(parseLine(lines[i]));
+                            }
+                            this._sectorCrosswalk = { header: header, mappings: mappings };
+                            return [2 /*return*/, this._sectorCrosswalk];
+                    }
+                });
+            });
+        };
         return WebModel;
     }());
 
     exports.CommodityVector = CommodityVector;
     exports.Matrix = Matrix;
+    exports.NaicsMap = NaicsMap;
     exports.WebApi = WebApi;
     exports.WebModel = WebModel;
     exports.max = max;
