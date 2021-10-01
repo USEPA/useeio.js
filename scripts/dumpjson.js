@@ -25,7 +25,7 @@ for (const arg of process.argv) {
       apikey = arg;
       break;
     case '--calculate':
-      calculate = arg.toLowerCase() == 'true';
+      calculate = arg.toLowerCase() === 'true';
       break;
     default:
       args[flag.substring(2)] = arg;
@@ -48,6 +48,7 @@ const http = endpoint.startsWith('https')
 
 // the target folder where we store the downloaded data
 const targetDir = __dirname + '/../data/api';
+fs.mkdirSync(targetDir, {recursive: true});
 
 /** Fetches the resource with the given path from the API. */
 async function fetch(path) {

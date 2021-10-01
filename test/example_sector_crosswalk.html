@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="../dist/useeio.js"></script>
+</head>
+<body>
+
+  <script>
+    (async function () {
+
+      const model = useeio.modelOf({
+        endpoint: "http://localhost:8080/api",
+        model: "USEEIOv2.0"
+      });
+
+      const crosswalk = await model.sectorCrosswalk();
+      console.log(crosswalk.header);
+      for (let i = 0; i < 10; i++) {
+        console.log(crosswalk.mappings[i]);
+      }
+    })();
+
+  </script>
+
+</body>
+</html>
