@@ -82,6 +82,10 @@ export interface ModelInfo {
    * An optional model description.
    */
   description?: string;
+
+  hash?: string;
+
+  sectorschema?: string;
 }
 
 /**

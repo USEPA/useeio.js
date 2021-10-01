@@ -255,6 +255,7 @@ export class WebModel {
   private _isMultiRegional?: boolean;
   private _sectorAggregation?: SectorAggregation;
   private _sectorCrosswalk?: SectorCrosswalk;
+  private _info?: ModelInfo;
 
   constructor(private api: WebApi, private readonly modelId: string) {
     this._matrices = {};
@@ -264,6 +265,19 @@ export class WebModel {
 
   id(): string {
     return this.modelId;
+  }
+
+  async info(): Promise<ModelInfo | undefined> {
+    if (!this._info) {
+      const infos = await this.api.getModelInfos();
+      for (const info of infos) {
+        if (info.id == this.id()) {
+          this._info = info;
+          break;
+        }
+      }
+    }
+    return this._info;
   }
 
   /**
