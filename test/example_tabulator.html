@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8'>
+  <title>Tabulator example</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+  <link href="https://unpkg.com/tabulator-tables@5.0.7/dist/css/tabulator.min.css" rel="stylesheet">
+  <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.0.7/dist/js/tabulator.min.js"></script>
+  <script src="../dist/useeio.min.js"></script>
+</head>
+
+<body>
+
+  <div id="table"></div>
+
+  <script>
+
+    const model = useeio.modelOf({
+      endpoint: 'https://smmtool.app.cloud.gov/api',
+      model: 'USEEIOv2.0',
+    });
+
+    async function main() {
+
+      // compute the table data
+      const q = await model.matrix('q');
+      const sectors = await model.sectors();
+      const indicator = (await model.indicators())
+        .filter(i => i.code === 'JOBS')[0];
+      const impacts = await model.matrix('D');
+      const tableData = sectors.map(sector => {
+        const output = q.get(sector.index, 0);
+        const jobs = output * impacts.get(indicator.index, sector.index);
+        return {
+          ...sector,
+          output: Math.round(output),
+          jobs: Math.round(jobs)
+        };
+      });
+
+      var table = new Tabulator("#table", {
+        height: 500,
+        data: tableData,
+        layout: "fitColumns",
+        columns: [
+          { title: "Commodity", field: "name", width: "35%" },
+          { title: "Location", field: "location" },
+          { title: "Total commodity output", field: "output" },
+          { title: "Jobs", field: "jobs" },
+        ],
+      });
+    }
+    main();
+
+  </script>
+
+</body>
+
+</html>
