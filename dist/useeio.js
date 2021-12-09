@@ -243,6 +243,28 @@
         IndicatorGroup["ECONOMIC_SOCIAL"] = "Economic & Social";
         IndicatorGroup["CHEMICAL_RELEASES"] = "Chemical Releases";
     })(exports.IndicatorGroup || (exports.IndicatorGroup = {}));
+    /**
+     * A demand vector maps sector IDs to their demand values.
+     */
+    var DemandVector = /** @class */ (function () {
+        function DemandVector(entries) {
+            this.map = {};
+            if (entries) {
+                for (var _i = 0, entries_1 = entries; _i < entries_1.length; _i++) {
+                    var e = entries_1[_i];
+                    this.map[e.sector] = e.amount;
+                }
+            }
+        }
+        DemandVector.prototype.get = function (sectorId) {
+            var val = this.map[sectorId];
+            if (!val) {
+                return 0.0;
+            }
+            return val;
+        };
+        return DemandVector;
+    }());
 
     var NaicsMap = /** @class */ (function () {
         function NaicsMap(_map) {
@@ -1004,6 +1026,7 @@
     }());
 
     exports.CommodityVector = CommodityVector;
+    exports.DemandVector = DemandVector;
     exports.Matrix = Matrix;
     exports.NaicsMap = NaicsMap;
     exports.WebApi = WebApi;

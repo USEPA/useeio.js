@@ -204,6 +204,14 @@ declare module "model" {
         amount: number;
     }
     /**
+     * A demand vector maps sector IDs to their demand values.
+     */
+    export class DemandVector {
+        private map;
+        constructor(entries: DemandEntry[]);
+        get(sectorId: string): number;
+    }
+    /**
      * Describes the perspective of a calculation result:
      *
      * * `direct`: direct contribution results: `D * diag(s)`
