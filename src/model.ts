@@ -179,6 +179,31 @@ export interface DemandEntry {
 }
 
 /**
+ * A demand vector maps sector IDs to their demand values.
+ */
+export class DemandVector {
+
+  private map: { [sectorId: string]: number };
+
+  constructor(entries: DemandEntry[]) {
+    this.map = {};
+    if (entries) {
+      for (const e of entries) {
+        this.map[e.sector] = e.amount;
+      }
+    }
+  }
+
+  public get(sectorId: string): number {
+    const val = this.map[sectorId];
+    if (!val) {
+      return 0.0;
+    }
+    return val;
+  }
+}
+
+/**
  * Describes the perspective of a calculation result:
  *
  * * `direct`: direct contribution results: `D * diag(s)`
