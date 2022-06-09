@@ -265,6 +265,12 @@
         };
         return DemandVector;
     }());
+    exports.Region = void 0;
+    (function (Region) {
+        Region["DOMESTIC"] = "DOMESTIC";
+        Region["NON_DOMESTIC"] = "NON_DOMESTIC";
+        Region["ALL"] = "ALL";
+    })(exports.Region || (exports.Region = {}));
 
     var NaicsMap = /** @class */ (function () {
         function NaicsMap(_map) {

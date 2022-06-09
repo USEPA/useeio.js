@@ -1,3 +1,9 @@
+
+// enable type-hints
+/// <reference types="../dist/useeio" />
+/** @type {import('useeio')} */
+var useeio = useeio;
+
 /*
 const model = useeio.modelOf({
   endpoint: 'http://localhost:8080/api',
@@ -5,6 +11,7 @@ const model = useeio.modelOf({
   asJsonFiles: true,
 });
 */
+
 const model = useeio.modelOf({
   endpoint: 'http://srocka.greendelta.com/api',
   model: 'USEEIOv2.1-422',

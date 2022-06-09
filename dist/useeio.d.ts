@@ -268,6 +268,11 @@ declare module "model" {
         header: string[];
         mappings: string[][];
     }
+    export enum Region {
+        DOMESTIC = "DOMESTIC",
+        NON_DOMESTIC = "NON_DOMESTIC",
+        ALL = "ALL"
+    }
 }
 declare module "webapi" {
     import { Matrix } from "matrix";

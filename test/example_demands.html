@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8'>
+  <title>Available demand vectors</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+  <link href="https://unpkg.com/tabulator-tables@5.2.7/dist/css/tabulator.min.css" rel="stylesheet">
+  <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.2.7/dist/js/tabulator.min.js"></script>
+
+  <script src="../dist/useeio.js"></script>
+</head>
+
+<body>
+
+  <div id="table"></div>
+
+  <script src="./config.js"></script>
+  <script>
+
+    async function main() {
+      const demands = await model.demands()
+      new Tabulator("#table", {
+        data: demands,
+        layout: "fitColumns",
+        columns: [
+          { title: "ID", field: "id" },
+          { title: "Year", field: "year" },
+          { title: "Location", field: "location" },
+          { title: "Type", field: "type" },
+          { title: "System", field: "system" },
+        ],
+      });
+    }
+    main();
+
+  </script>
+
+</body>
+
+</html>

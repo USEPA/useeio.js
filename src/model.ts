@@ -291,3 +291,9 @@ export interface SectorCrosswalk {
   header: string[];
   mappings: string[][];
 }
+
+export enum Region {
+  DOMESTIC = "DOMESTIC",
+  NON_DOMESTIC = "NON_DOMESTIC",
+  ALL = "ALL"
+}
