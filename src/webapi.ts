@@ -1,4 +1,4 @@
-import {Matrix} from './matrix';
+import { Matrix } from './matrix';
 import {
   CalculationSetup,
   DemandEntry,
@@ -134,7 +134,7 @@ export class WebApi {
   }
 
   async getText(...path: string[]): Promise<string> {
-    let url = this._target(...path);
+    const url = this._target(...path);
     const req = this._request("GET", url);
     return new Promise<string>((resolve, reject) => {
       req.onload = () => {
@@ -549,7 +549,7 @@ export class WebModel {
     const text = await this.api.getText("sectorcrosswalk.csv");
     const lines = text.split(/\r?\n/);
     if (lines.length == 0) {
-      return {header: [], mappings: []}
+      return { header: [], mappings: [] }
     }
 
     const parseLine = (line: string): string[] => {
@@ -590,7 +590,7 @@ export class WebModel {
     for (let i = 1; i < lines.length; i++) {
       mappings.push(parseLine(lines[i]));
     }
-    this._sectorCrosswalk = {header, mappings};
+    this._sectorCrosswalk = { header, mappings };
     return this._sectorCrosswalk;
   }
 

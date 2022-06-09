@@ -36,13 +36,15 @@
       }
       info.textContent = `Calculating results for demand: ${demandId} ...`;
 
+      // get the demand vector and calculate results
       const demand = await model.demand(demandId);
       const result = await model.calculate({
         perspective: 'direct',
         demand,
       });
-      const indicators = await model.indicators();
 
+      // map results to a table
+      const indicators = await model.indicators();
       const totals = indicators.map(indicator => {
         return {
           name: `${indicator.name} - ${indicator.code}`,
@@ -50,7 +52,6 @@
           unit: indicator.unit,
         }
       });
-
       info.textContent = `Results for demand: ${demandId}`;
       new Tabulator("#table", {
         data: totals,
