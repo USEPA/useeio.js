@@ -6,13 +6,9 @@
 </head>
 <body>
 
+  <script src="./config.js"></script>
   <script>
     (async () => {
-      const model = useeio.modelOf({
-        endpoint: "http://localhost:8080/api",
-        model: "USEEIOv2.0",
-        asJsonFiles: true,
-      });
       const naics = await useeio.NaicsMap.of(model);
       console.log(naics.toBea("562"));
       console.log(naics.toBea(["922140", "922160"]));

@@ -6,13 +6,9 @@
 </head>
 <body>
 
+  <script src="./config.js"></script>
   <script>
     (async () => {
-      const model = useeio.modelOf({
-        endpoint: "http://localhost:8080/api",
-        model: "USEEIOv2.0",
-        asJsonFiles: true,
-      });
       const info = await model.info();
       console.log(info);
     })();

@@ -16,12 +16,13 @@ directly:
 $ npm install git+https://github.com/msrocka/useeio.js.git
 ```
 
-Alternatively, you can download and bzuld it locally:
+Alternatively, you can download and build it locally:
 
 ```bash
 $ cd {some folder}
 $ git clone https://github.com/msrocka/useeio.js.git
 $ cd useeio.js
+$ npm install
 $ npm run build
 ```
 

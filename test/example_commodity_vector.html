@@ -21,18 +21,13 @@
 <body>
 
   <p>
-    This example loads the commodity vector q from the API and then
-    calculates the upstream direct requirements, direct impacts, and
-    direct downstream monetary flows related to this vector.
+    This example loads the commodity vector q from the API and then calculates
+    the upstream direct requirements, direct impacts, and direct downstream
+    monetary flows related to this vector.
   </p>
 
+  <script src="./config.js"></script>
   <script>
-    const model = useeio.modelOf({
-      endpoint: 'http://localhost:8080/api',
-      model: 'USEEIOv2.0',
-      asJsonFiles: true,
-    });
-
     async function main() {
       const q = await model.matrix('q');
       const impacts = await useeio.CommodityVector.directImpactsOf(model, q);
