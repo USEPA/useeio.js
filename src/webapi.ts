@@ -435,12 +435,12 @@ export class WebModel {
     // calculate the perspective result
     const N = await this.matrix("N");
     let data: number[][];
-    let L: Matrix, s: number[];
+    let L: Matrix, D: Matrix, s: number[];
     switch (setup.perspective) {
       case "direct":
         L = await this.matrix("L");
         s = L.multiplyVector(demand);
-        const D = await this.matrix("D");
+        D = await this.matrix("D");
         data = D.scaleColumns(s).data;
         break;
       case "intermediate":
