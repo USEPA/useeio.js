@@ -1,5 +1,5 @@
 import { zeros } from "./calc";
-import { Sector } from "./model";
+import { Indicator, Sector } from "./model";
 import { WebModel } from "./webapi"
 
 /**
@@ -72,5 +72,81 @@ export class SectorAnalysis {
       upstreamDomestic,
       upstreamNonDomestic,
     }
+  }
+
+  async getPurchaseImpacts(ix: Indicator | Indicator[]): Promise<number[]> {
+    const purchases = await this.model.column("A", this.sector.index);
+    if (!Array.isArray(ix)) {
+      // simply scale the indicator row of N by purchase amounts 
+      const impacts = await this.model.row("N", ix.index);
+      return impacts.map((val, idx) => val * purchases[idx]);
+    } else {
+      // calculate single scores for multiple indicators
+      const results = zeros(purchases.length);
+      const N = await this.model.matrix("N");
+      for (let j = 0; j < purchases.length; j++) {
+        const norm = new EuclideanNormalizer(this.normalizationTotals);
+        const p = purchases[j];
+        for (const indicator of ix) {
+          norm.add(indicator.index, p * N.get(indicator.index, j));
+        }
+        results[j] = norm.finish();
+      }
+      return results;
+    }
+  }
+}
+
+abstract class Normalizer {
+  protected value = 0;
+
+  constructor(readonly totals: number[]) {
+  }
+
+  abstract add(idx: number, next: number): void;
+
+  abstract finish(): number;
+}
+
+class SimpleNormalizer extends Normalizer {
+
+  add(idx: number, next: number) {
+    if (next === 0) {
+      return;
+    }
+    const total = this.totals[idx];
+    if (total === 0) {
+      return;
+    }
+    this.value += next / total;
+  }
+
+  finish(): number {
+    return this.value;
+  }
+}
+
+class EuclideanNormalizer extends Normalizer {
+
+  add(idx: number, next: number) {
+    if (next === 0) {
+      return;
+    }
+    const total = this.totals[idx];
+    if (total === 0) {
+      return;
+    }
+    const v = Math.pow(next / total, 2);
+    if (next > 0) {
+      this.value += v;
+    } else {
+      this.value -= v;
+    }
+  }
+
+  finish(): number {
+    return this.value > 0
+      ? Math.sqrt(this.value)
+      : 0;
   }
 }

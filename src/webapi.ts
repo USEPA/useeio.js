@@ -393,14 +393,39 @@ export class WebModel {
   }
 
   /**
-   * Get the column of the matrix with the given name from the model.
+   * Get a column from a matrix.
    */
   async column(matrix: MatrixName, index: number): Promise<number[]> {
+    
+    // first check if the matrix is cached
+    let m = this._matrices[matrix];
+    if (m) {
+      return m.getCol(index);
+    }
+
     if (!this.api.isJsonDump()) {
       return this.api.getJson(this.modelId, "matrix", `${matrix}?col=${index}`);
     }
-    const m = await this.matrix(matrix);
+    m = await this.matrix(matrix);
     return m.getCol(index);
+  }
+
+  /**
+   * Get a row from a matrix.
+   */
+  async row(matrix: MatrixName, index: number): Promise<number[]> {
+    
+    // first check if the matrix is cached
+    let m = this._matrices[matrix];
+    if (m) {
+      return m.getRow(index);
+    }
+
+    if (!this.api.isJsonDump()) {
+      return this.api.getJson(this.modelId, "matrix", `${matrix}?row=${index}`);
+    }
+    m = await this.matrix(matrix);
+    return m.getRow(index);
   }
 
   /**
