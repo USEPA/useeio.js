@@ -1,4 +1,5 @@
 import { Matrix } from "./matrix";
+import { Tensor } from "./model";
 import { WebModel } from "./webapi";
 
 export function zeros(len: number): number[] {
@@ -23,7 +24,7 @@ export class CommodityVector {
     const v = vector instanceof Matrix
       ? vector.getCol(0)
       : vector;
-    const D = await model.matrix("D");
+    const D = await model.matrix(Tensor.D);
     return D.multiplyVector(v);
   }
 
@@ -32,7 +33,7 @@ export class CommodityVector {
     const v = vector instanceof Matrix
       ? vector.getCol(0)
       : vector;
-    const A = await model.matrix("A");
+    const A = await model.matrix(Tensor.A);
     return A.multiplyVector(v);
   }
 
@@ -41,7 +42,7 @@ export class CommodityVector {
     const v = vector instanceof Matrix
       ? vector.getCol(0)
       : vector;
-    const A = await model.matrix("A");
+    const A = await model.matrix(Tensor.A);
     const n = Math.min(A.cols, v.length);
     const d = zeros(n);
     for (const row of A.data) {

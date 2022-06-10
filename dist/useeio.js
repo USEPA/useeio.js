@@ -171,83 +171,6 @@
         return Matrix;
     }());
 
-    function zeros(len) {
-        return new Array(len).fill(0);
-    }
-    function ones(len) {
-        return new Array(len).fill(1);
-    }
-    function max(xs) {
-        if (!xs || xs.length === 0) {
-            return 0;
-        }
-        return xs.reduce(function (maxval, x) { return Math.max(maxval, x); });
-    }
-    var CommodityVector = /** @class */ (function () {
-        function CommodityVector() {
-        }
-        CommodityVector.directImpactsOf = function (model, vector) {
-            return __awaiter(this, void 0, void 0, function () {
-                var v, D;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            v = vector instanceof Matrix
-                                ? vector.getCol(0)
-                                : vector;
-                            return [4 /*yield*/, model.matrix("D")];
-                        case 1:
-                            D = _a.sent();
-                            return [2 /*return*/, D.multiplyVector(v)];
-                    }
-                });
-            });
-        };
-        CommodityVector.directRequirementsOf = function (model, vector) {
-            return __awaiter(this, void 0, void 0, function () {
-                var v, A;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            v = vector instanceof Matrix
-                                ? vector.getCol(0)
-                                : vector;
-                            return [4 /*yield*/, model.matrix("A")];
-                        case 1:
-                            A = _a.sent();
-                            return [2 /*return*/, A.multiplyVector(v)];
-                    }
-                });
-            });
-        };
-        CommodityVector.directDownstreamsOf = function (model, vector) {
-            return __awaiter(this, void 0, void 0, function () {
-                var v, A, n, d, _i, _a, row, j;
-                return __generator(this, function (_b) {
-                    switch (_b.label) {
-                        case 0:
-                            v = vector instanceof Matrix
-                                ? vector.getCol(0)
-                                : vector;
-                            return [4 /*yield*/, model.matrix("A")];
-                        case 1:
-                            A = _b.sent();
-                            n = Math.min(A.cols, v.length);
-                            d = zeros(n);
-                            for (_i = 0, _a = A.data; _i < _a.length; _i++) {
-                                row = _a[_i];
-                                for (j = 0; j < n; j++) {
-                                    d[j] += row[j] * v[j];
-                                }
-                            }
-                            return [2 /*return*/, d];
-                    }
-                });
-            });
-        };
-        return CommodityVector;
-    }());
-
     /**
      * An enumeration of the valid indicator groups of the USEEIO API.
      */
@@ -312,6 +235,83 @@
         Region["NON_DOMESTIC"] = "NON_DOMESTIC";
         Region["ALL"] = "ALL";
     })(exports.Region || (exports.Region = {}));
+
+    function zeros(len) {
+        return new Array(len).fill(0);
+    }
+    function ones(len) {
+        return new Array(len).fill(1);
+    }
+    function max(xs) {
+        if (!xs || xs.length === 0) {
+            return 0;
+        }
+        return xs.reduce(function (maxval, x) { return Math.max(maxval, x); });
+    }
+    var CommodityVector = /** @class */ (function () {
+        function CommodityVector() {
+        }
+        CommodityVector.directImpactsOf = function (model, vector) {
+            return __awaiter(this, void 0, void 0, function () {
+                var v, D;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            v = vector instanceof Matrix
+                                ? vector.getCol(0)
+                                : vector;
+                            return [4 /*yield*/, model.matrix(exports.Tensor.D)];
+                        case 1:
+                            D = _a.sent();
+                            return [2 /*return*/, D.multiplyVector(v)];
+                    }
+                });
+            });
+        };
+        CommodityVector.directRequirementsOf = function (model, vector) {
+            return __awaiter(this, void 0, void 0, function () {
+                var v, A;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            v = vector instanceof Matrix
+                                ? vector.getCol(0)
+                                : vector;
+                            return [4 /*yield*/, model.matrix(exports.Tensor.A)];
+                        case 1:
+                            A = _a.sent();
+                            return [2 /*return*/, A.multiplyVector(v)];
+                    }
+                });
+            });
+        };
+        CommodityVector.directDownstreamsOf = function (model, vector) {
+            return __awaiter(this, void 0, void 0, function () {
+                var v, A, n, d, _i, _a, row, j;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
+                            v = vector instanceof Matrix
+                                ? vector.getCol(0)
+                                : vector;
+                            return [4 /*yield*/, model.matrix(exports.Tensor.A)];
+                        case 1:
+                            A = _b.sent();
+                            n = Math.min(A.cols, v.length);
+                            d = zeros(n);
+                            for (_i = 0, _a = A.data; _i < _a.length; _i++) {
+                                row = _a[_i];
+                                for (j = 0; j < n; j++) {
+                                    d[j] += row[j] * v[j];
+                                }
+                            }
+                            return [2 /*return*/, d];
+                    }
+                });
+            });
+        };
+        return CommodityVector;
+    }());
 
     var NaicsMap = /** @class */ (function () {
         function NaicsMap(_map) {
