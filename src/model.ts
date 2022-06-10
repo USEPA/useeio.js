@@ -260,28 +260,29 @@ export interface Result {
 }
 
 /**
- * The currently supported matrices, see:
+ * The currently supported matrices and vectors, see:
  * https://github.com/USEPA/USEEIO_API/blob/master/doc/data_format.md
  */
-export type MatrixName =
-  "A"
-  | "A_d"
-  | "B"
-  | "C"
-  | "D"
-  | "L"
-  | "L_d"
-  | "M"
-  | "M_d"
-  | "N"
-  | "N_d"
-  | "Phi"
-  | "q"
-  | "Rho"
-  | "U"
-  | "U_d"
-  | "V"
-  | "x";
+export enum Tensor {
+  A = "A",
+  A_d = "A_d",
+  B = "B",
+  C = "C",
+  D = "D",
+  L = "L",
+  L_d = "L_d",
+  M = "M",
+  M_d = "M_d",
+  N = "N",
+  N_d = "N_d",
+  Phi = "Phi",
+  q = "q",
+  Rho = "Rho",
+  U = "U",
+  U_d = "U_d",
+  V = "V",
+  x = "x",
+}  
 
 /**
  * The sector crosswalk contains mappings between different sector

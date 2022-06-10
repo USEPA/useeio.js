@@ -4,7 +4,7 @@ import {
   DemandEntry,
   DemandInfo,
   Indicator,
-  MatrixName,
+  Tensor,
   ModelInfo,
   Result,
   Sector,
@@ -381,7 +381,7 @@ export class WebModel {
   /**
    * Returns the matrix with the given name from the model.
    */
-  async matrix(name: MatrixName): Promise<Matrix> {
+  async matrix(name: Tensor): Promise<Matrix> {
     let m = this._matrices[name];
     if (m) {
       return m;
@@ -395,7 +395,7 @@ export class WebModel {
   /**
    * Get a column from a matrix.
    */
-  async column(matrix: MatrixName, index: number): Promise<number[]> {
+  async column(matrix: Tensor, index: number): Promise<number[]> {
     
     // first check if the matrix is cached
     let m = this._matrices[matrix];
@@ -413,7 +413,7 @@ export class WebModel {
   /**
    * Get a row from a matrix.
    */
-  async row(matrix: MatrixName, index: number): Promise<number[]> {
+  async row(matrix: Tensor, index: number): Promise<number[]> {
     
     // first check if the matrix is cached
     let m = this._matrices[matrix];
@@ -458,18 +458,18 @@ export class WebModel {
     });
 
     // calculate the perspective result
-    const N = await this.matrix("N");
+    const N = await this.matrix(Tensor.N);
     let data: number[][];
     let L: Matrix, D: Matrix, s: number[];
     switch (setup.perspective) {
       case "direct":
-        L = await this.matrix("L");
+        L = await this.matrix(Tensor.L);
         s = L.multiplyVector(demand);
-        D = await this.matrix("D");
+        D = await this.matrix(Tensor.D);
         data = D.scaleColumns(s).data;
         break;
       case "intermediate":
-        L = await this.matrix("L");
+        L = await this.matrix(Tensor.L);
         s = L.multiplyVector(demand);
         data = N.scaleColumns(s).data;
         break;
