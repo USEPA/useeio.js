@@ -281,6 +281,31 @@
         };
         return DemandVector;
     }());
+    /**
+     * The currently supported matrices and vectors, see:
+     * https://github.com/USEPA/USEEIO_API/blob/master/doc/data_format.md
+     */
+    exports.Tensor = void 0;
+    (function (Tensor) {
+        Tensor["A"] = "A";
+        Tensor["A_d"] = "A_d";
+        Tensor["B"] = "B";
+        Tensor["C"] = "C";
+        Tensor["D"] = "D";
+        Tensor["L"] = "L";
+        Tensor["L_d"] = "L_d";
+        Tensor["M"] = "M";
+        Tensor["M_d"] = "M_d";
+        Tensor["N"] = "N";
+        Tensor["N_d"] = "N_d";
+        Tensor["Phi"] = "Phi";
+        Tensor["q"] = "q";
+        Tensor["Rho"] = "Rho";
+        Tensor["U"] = "U";
+        Tensor["U_d"] = "U_d";
+        Tensor["V"] = "V";
+        Tensor["x"] = "x";
+    })(exports.Tensor || (exports.Tensor = {}));
     exports.Region = void 0;
     (function (Region) {
         Region["DOMESTIC"] = "DOMESTIC";
@@ -876,7 +901,7 @@
                                     demand[i] = entry.amount;
                                 }
                             });
-                            return [4 /*yield*/, this.matrix("N")];
+                            return [4 /*yield*/, this.matrix(exports.Tensor.N)];
                         case 3:
                             N = _b.sent();
                             _a = setup.perspective;
@@ -886,16 +911,16 @@
                                 case "final": return [3 /*break*/, 9];
                             }
                             return [3 /*break*/, 10];
-                        case 4: return [4 /*yield*/, this.matrix("L")];
+                        case 4: return [4 /*yield*/, this.matrix(exports.Tensor.L)];
                         case 5:
                             L = _b.sent();
                             s = L.multiplyVector(demand);
-                            return [4 /*yield*/, this.matrix("D")];
+                            return [4 /*yield*/, this.matrix(exports.Tensor.D)];
                         case 6:
                             D = _b.sent();
                             data = D.scaleColumns(s).data;
                             return [3 /*break*/, 11];
-                        case 7: return [4 /*yield*/, this.matrix("L")];
+                        case 7: return [4 /*yield*/, this.matrix(exports.Tensor.L)];
                         case 8:
                             L = _b.sent();
                             s = L.multiplyVector(demand);
@@ -1115,8 +1140,8 @@
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, (directOnly
-                                ? this.model.column("D", this.sector.index)
-                                : this.model.column("N", this.sector.index))];
+                                ? this.model.column(exports.Tensor.D, this.sector.index)
+                                : this.model.column(exports.Tensor.N, this.sector.index))];
                         case 1:
                             profile = _a.sent();
                             for (i = 0; i < profile.length; i++) {
@@ -1132,13 +1157,13 @@
                 var total, direct, domesticTotal, upstreamTotal, upstreamDomestic, upstreamNonDomestic, i;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.model.column("N", this.sector.index)];
+                        case 0: return [4 /*yield*/, this.model.column(exports.Tensor.N, this.sector.index)];
                         case 1:
                             total = _a.sent();
-                            return [4 /*yield*/, this.model.column("D", this.sector.index)];
+                            return [4 /*yield*/, this.model.column(exports.Tensor.D, this.sector.index)];
                         case 2:
                             direct = _a.sent();
-                            return [4 /*yield*/, this.model.column("N_d", this.sector.index)];
+                            return [4 /*yield*/, this.model.column(exports.Tensor.N_d, this.sector.index)];
                         case 3:
                             domesticTotal = _a.sent();
                             upstreamTotal = zeros(total.length);
@@ -1160,22 +1185,29 @@
                 });
             });
         };
+        /**
+         * Get the impacts of the direct purchases of the analyzed sector. Returned is
+         * an array in sector-form with a result for each sector in the model. The
+         * results are based on 1 USD of output of the analyzed sector. When this
+         * function is called with multiple indicators a normalized single score is
+         * calculated.
+         */
         SectorAnalysis.prototype.getPurchaseImpacts = function (ix) {
             return __awaiter(this, void 0, void 0, function () {
                 var purchases, impacts, results, N, j, norm, p, _i, ix_1, indicator;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.model.column("A", this.sector.index)];
+                        case 0: return [4 /*yield*/, this.model.column(exports.Tensor.A, this.sector.index)];
                         case 1:
                             purchases = _a.sent();
                             if (!!Array.isArray(ix)) return [3 /*break*/, 3];
-                            return [4 /*yield*/, this.model.row("N", ix.index)];
+                            return [4 /*yield*/, this.model.row(exports.Tensor.N, ix.index)];
                         case 2:
                             impacts = _a.sent();
                             return [2 /*return*/, impacts.map(function (val, idx) { return val * purchases[idx]; })];
                         case 3:
                             results = zeros(purchases.length);
-                            return [4 /*yield*/, this.model.matrix("N")];
+                            return [4 /*yield*/, this.model.matrix(exports.Tensor.N)];
                         case 4:
                             N = _a.sent();
                             for (j = 0; j < purchases.length; j++) {
@@ -1184,6 +1216,38 @@
                                 for (_i = 0, ix_1 = ix; _i < ix_1.length; _i++) {
                                     indicator = ix_1[_i];
                                     norm.add(indicator.index, p * N.get(indicator.index, j));
+                                }
+                                results[j] = norm.finish();
+                            }
+                            return [2 /*return*/, results];
+                    }
+                });
+            });
+        };
+        SectorAnalysis.prototype.getSupplyChainImpacts = function (ix) {
+            return __awaiter(this, void 0, void 0, function () {
+                var scaling, impacts, results, D, j, norm, s, _i, ix_2, indicator;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.model.column(exports.Tensor.L, this.sector.index)];
+                        case 1:
+                            scaling = _a.sent();
+                            if (!!Array.isArray(ix)) return [3 /*break*/, 3];
+                            return [4 /*yield*/, this.model.row(exports.Tensor.D, ix.index)];
+                        case 2:
+                            impacts = _a.sent();
+                            return [2 /*return*/, impacts.map(function (val, idx) { return val * scaling[idx]; })];
+                        case 3:
+                            results = zeros(scaling.length);
+                            return [4 /*yield*/, this.model.matrix(exports.Tensor.D)];
+                        case 4:
+                            D = _a.sent();
+                            for (j = 0; j < scaling.length; j++) {
+                                norm = new EuclideanNormalizer(this.normalizationTotals);
+                                s = scaling[j];
+                                for (_i = 0, ix_2 = ix; _i < ix_2.length; _i++) {
+                                    indicator = ix_2[_i];
+                                    norm.add(indicator.index, s * D.get(indicator.index, j));
                                 }
                                 results[j] = norm.finish();
                             }

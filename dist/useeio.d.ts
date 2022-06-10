@@ -256,10 +256,29 @@ declare module "model" {
         totals: number[];
     }
     /**
-     * The currently supported matrices, see:
+     * The currently supported matrices and vectors, see:
      * https://github.com/USEPA/USEEIO_API/blob/master/doc/data_format.md
      */
-    export type MatrixName = "A" | "A_d" | "B" | "C" | "D" | "L" | "L_d" | "M" | "M_d" | "N" | "N_d" | "Phi" | "q" | "Rho" | "U" | "U_d" | "V" | "x";
+    export enum Tensor {
+        A = "A",
+        A_d = "A_d",
+        B = "B",
+        C = "C",
+        D = "D",
+        L = "L",
+        L_d = "L_d",
+        M = "M",
+        M_d = "M_d",
+        N = "N",
+        N_d = "N_d",
+        Phi = "Phi",
+        q = "q",
+        Rho = "Rho",
+        U = "U",
+        U_d = "U_d",
+        V = "V",
+        x = "x"
+    }
     /**
      * The sector crosswalk contains mappings between different sector
      * classification schemes.
@@ -276,7 +295,7 @@ declare module "model" {
 }
 declare module "webapi" {
     import { Matrix } from "matrix";
-    import { CalculationSetup, DemandEntry, DemandInfo, Indicator, MatrixName, ModelInfo, Result, Sector, SectorCrosswalk } from "model";
+    import { CalculationSetup, DemandEntry, DemandInfo, Indicator, Tensor, ModelInfo, Result, Sector, SectorCrosswalk } from "model";
     /**
      * This module contains the functions and type definitions for accessing an
      * [USEEIO API](https://github.com/USEPA/USEEIO_API) endpoint. The widgets
@@ -432,15 +451,15 @@ declare module "webapi" {
         /**
          * Returns the matrix with the given name from the model.
          */
-        matrix(name: MatrixName): Promise<Matrix>;
+        matrix(name: Tensor): Promise<Matrix>;
         /**
          * Get a column from a matrix.
          */
-        column(matrix: MatrixName, index: number): Promise<number[]>;
+        column(matrix: Tensor, index: number): Promise<number[]>;
         /**
          * Get a row from a matrix.
          */
-        row(matrix: MatrixName, index: number): Promise<number[]>;
+        row(matrix: Tensor, index: number): Promise<number[]>;
         /**
          * Runs a calculation for the given setup. Note that this will run the
          * calculation locally if the API is defined to fetch JSON files. Depending
@@ -520,7 +539,15 @@ declare module "sector-analysis" {
         static of(model: WebModel, sector: Sector, demandId: string): Promise<SectorAnalysis>;
         getEnvironmentalProfile(directOnly?: boolean): Promise<number[]>;
         getImpactsByScope(): Promise<ScopePartition>;
+        /**
+         * Get the impacts of the direct purchases of the analyzed sector. Returned is
+         * an array in sector-form with a result for each sector in the model. The
+         * results are based on 1 USD of output of the analyzed sector. When this
+         * function is called with multiple indicators a normalized single score is
+         * calculated.
+         */
         getPurchaseImpacts(ix: Indicator | Indicator[]): Promise<number[]>;
+        getSupplyChainImpacts(ix: Indicator | Indicator[]): Promise<number[]>;
     }
 }
 declare module "useeio" {

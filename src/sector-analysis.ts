@@ -104,8 +104,26 @@ export class SectorAnalysis {
   }
 
   async getSupplyChainImpacts(ix: Indicator | Indicator[]): Promise<number[]> {
+    const scaling = await this.model.column(Tensor.L, this.sector.index);
+    if (!Array.isArray(ix)) {
+      // simply scale the indicator row of D by the scaling vector
+      const impacts = await this.model.row(Tensor.D, ix.index);
+      return impacts.map((val, idx) => val * scaling[idx]);
+    } else {
+       // calculate single scores for multiple indicators
+       const results = zeros(scaling.length);
+       const D = await this.model.matrix(Tensor.D);
+       for (let j = 0; j < scaling.length; j++) {
+         const norm = new EuclideanNormalizer(this.normalizationTotals);
+         const s = scaling[j];
+         for (const indicator of ix) {
+           norm.add(indicator.index, s * D.get(indicator.index, j));
+         }
+         results[j] = norm.finish();
+       }
+       return results;
+    }
   }
-
 }
 
 abstract class Normalizer {
