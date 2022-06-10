@@ -434,9 +434,13 @@ declare module "webapi" {
          */
         matrix(name: MatrixName): Promise<Matrix>;
         /**
-         * Get the column of the matrix with the given name from the model.
+         * Get a column from a matrix.
          */
         column(matrix: MatrixName, index: number): Promise<number[]>;
+        /**
+         * Get a row from a matrix.
+         */
+        row(matrix: MatrixName, index: number): Promise<number[]>;
         /**
          * Runs a calculation for the given setup. Note that this will run the
          * calculation locally if the API is defined to fetch JSON files. Depending
@@ -487,7 +491,7 @@ declare module "sectors" {
     }
 }
 declare module "sector-analysis" {
-    import { Sector } from "model";
+    import { Indicator, Sector } from "model";
     import { WebModel } from "webapi";
     /**
      * Contains the indicator results related to one USD output of a sector for
@@ -516,6 +520,7 @@ declare module "sector-analysis" {
         static of(model: WebModel, sector: Sector, demandId: string): Promise<SectorAnalysis>;
         getEnvironmentalProfile(directOnly?: boolean): Promise<number[]>;
         getImpactsByScope(): Promise<ScopePartition>;
+        getPurchaseImpacts(ix: Indicator | Indicator[]): Promise<number[]>;
     }
 }
 declare module "useeio" {

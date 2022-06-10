@@ -18,6 +18,22 @@
     OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
     PERFORMANCE OF THIS SOFTWARE.
     ***************************************************************************** */
+    /* global Reflect, Promise */
+
+    var extendStatics = function(d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+
+    function __extends(d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    }
 
     function __awaiter(thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -780,7 +796,7 @@
             });
         };
         /**
-         * Get the column of the matrix with the given name from the model.
+         * Get a column from a matrix.
          */
         WebModel.prototype.column = function (matrix, index) {
             return __awaiter(this, void 0, void 0, function () {
@@ -788,6 +804,10 @@
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
+                            m = this._matrices[matrix];
+                            if (m) {
+                                return [2 /*return*/, m.getCol(index)];
+                            }
                             if (!this.api.isJsonDump()) {
                                 return [2 /*return*/, this.api.getJson(this.modelId, "matrix", "".concat(matrix, "?col=").concat(index))];
                             }
@@ -795,6 +815,30 @@
                         case 1:
                             m = _a.sent();
                             return [2 /*return*/, m.getCol(index)];
+                    }
+                });
+            });
+        };
+        /**
+         * Get a row from a matrix.
+         */
+        WebModel.prototype.row = function (matrix, index) {
+            return __awaiter(this, void 0, void 0, function () {
+                var m;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            m = this._matrices[matrix];
+                            if (m) {
+                                return [2 /*return*/, m.getRow(index)];
+                            }
+                            if (!this.api.isJsonDump()) {
+                                return [2 /*return*/, this.api.getJson(this.modelId, "matrix", "".concat(matrix, "?row=").concat(index))];
+                            }
+                            return [4 /*yield*/, this.matrix(matrix)];
+                        case 1:
+                            m = _a.sent();
+                            return [2 /*return*/, m.getRow(index)];
                     }
                 });
             });
@@ -1116,8 +1160,95 @@
                 });
             });
         };
+        SectorAnalysis.prototype.getPurchaseImpacts = function (ix) {
+            return __awaiter(this, void 0, void 0, function () {
+                var purchases, impacts, results, N, j, norm, p, _i, ix_1, indicator;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.model.column("A", this.sector.index)];
+                        case 1:
+                            purchases = _a.sent();
+                            if (!!Array.isArray(ix)) return [3 /*break*/, 3];
+                            return [4 /*yield*/, this.model.row("N", ix.index)];
+                        case 2:
+                            impacts = _a.sent();
+                            return [2 /*return*/, impacts.map(function (val, idx) { return val * purchases[idx]; })];
+                        case 3:
+                            results = zeros(purchases.length);
+                            return [4 /*yield*/, this.model.matrix("N")];
+                        case 4:
+                            N = _a.sent();
+                            for (j = 0; j < purchases.length; j++) {
+                                norm = new EuclideanNormalizer(this.normalizationTotals);
+                                p = purchases[j];
+                                for (_i = 0, ix_1 = ix; _i < ix_1.length; _i++) {
+                                    indicator = ix_1[_i];
+                                    norm.add(indicator.index, p * N.get(indicator.index, j));
+                                }
+                                results[j] = norm.finish();
+                            }
+                            return [2 /*return*/, results];
+                    }
+                });
+            });
+        };
         return SectorAnalysis;
     }());
+    var Normalizer = /** @class */ (function () {
+        function Normalizer(totals) {
+            this.totals = totals;
+            this.value = 0;
+        }
+        return Normalizer;
+    }());
+    /** @class */ ((function (_super) {
+        __extends(SimpleNormalizer, _super);
+        function SimpleNormalizer() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        SimpleNormalizer.prototype.add = function (idx, next) {
+            if (next === 0) {
+                return;
+            }
+            var total = this.totals[idx];
+            if (total === 0) {
+                return;
+            }
+            this.value += next / total;
+        };
+        SimpleNormalizer.prototype.finish = function () {
+            return this.value;
+        };
+        return SimpleNormalizer;
+    })(Normalizer));
+    var EuclideanNormalizer = /** @class */ (function (_super) {
+        __extends(EuclideanNormalizer, _super);
+        function EuclideanNormalizer() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        EuclideanNormalizer.prototype.add = function (idx, next) {
+            if (next === 0) {
+                return;
+            }
+            var total = this.totals[idx];
+            if (total === 0) {
+                return;
+            }
+            var v = Math.pow(next / total, 2);
+            if (next > 0) {
+                this.value += v;
+            }
+            else {
+                this.value -= v;
+            }
+        };
+        EuclideanNormalizer.prototype.finish = function () {
+            return this.value > 0
+                ? Math.sqrt(this.value)
+                : 0;
+        };
+        return EuclideanNormalizer;
+    }(Normalizer));
 
     exports.CommodityVector = CommodityVector;
     exports.DemandVector = DemandVector;
