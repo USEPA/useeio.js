@@ -3,7 +3,7 @@
 
 <head>
   <meta charset='utf-8'>
-  <title>Sector analysis</title>
+  <title>Sector analysis - scopes</title>
   <meta name='viewport' content='width=device-width, initial-scale=1'>
 
   <link href="https://unpkg.com/tabulator-tables@5.2.7/dist/css/tabulator.min.css" rel="stylesheet">
@@ -19,24 +19,7 @@
 
   <script src="./config.js"></script>
   <script>
-
-    function norm100(nums) {
-      let max = 0;
-      for (const num of nums) {
-        max = Math.max(Math.abs(num), max);
-      }
-      if (max === 0) {
-        return nums;
-      }
-      const norm = [];
-      for (const num of nums) {
-        norm.push(100 * num / max)
-      }
-      return norm;
-    }
-
-    (async () => {
-
+    async function main() {
       const info = document.getElementById("info");
       const demandId = await model.findDemand({
         system: "Complete",
@@ -54,28 +37,37 @@
 
       const analysis = await useeio.SectorAnalysis.of(model, sector, demandId);
       const indicators = await model.indicators();
-      const direct = norm100(await analysis.getEnvironmentalProfile(true));
-      const total = norm100(await analysis.getEnvironmentalProfile(false));
-      const results = indicators.map(i => {
-        return {
-          indicator: `${i.code} - ${i.name}`,
-          direct: direct[i.index],
-          total: total[i.index],
-        }
-      });
+      const partition = await analysis.getImpactsByScope();
 
-      info.textContent = `Environmental profile of ${sector.name} based on ${demandId}`;
+      const results = indicators.map(i => {
+        const k = i.index;
+        return {
+          indicator: `${i.code} - ${i.name} [${i.unit}]`,
+          total: partition.total[k],
+          direct: partition.direct[k],
+          upstream: partition.upstreamTotal[k],
+          upstreamDomestic: partition.upstreamDomestic[k],
+          upstreamNonDomestic: partition.upstreamNonDomestic[k],
+        }
+      })
+
+
+      info.textContent = `Scope results of: ${sector.name}`;
       new Tabulator("#table", {
         data: results,
         layout: "fitColumns",
         columns: [
           { title: "Indicator", field: "indicator" },
-          { title: "Direct", field: "direct", formatter: "progress" },
-          { title: "Total", field: "total", formatter: "progress" },
+          { title: "Total", field: "total" },
+          { title: "Direct", field: "direct" },
+          { title: "Upstream", field: "upstream" },
+          { title: "Upstream - domestic", field: "upstreamDomestic" },
+          { title: "Upstream - non-domestic", field: "upstreamNonDomestic" },
         ],
       });
 
-    })();
+    }
+    main();
 
   </script>
 

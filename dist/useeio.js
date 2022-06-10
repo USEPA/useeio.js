@@ -451,7 +451,7 @@
                                     }
                                 }
                                 else {
-                                    reject("request " + url + " failed: " + req.statusText);
+                                    reject("request ".concat(url, " failed: ").concat(req.statusText));
                                 }
                             };
                             req.send();
@@ -481,7 +481,7 @@
                                     }
                                 }
                                 else {
-                                    reject("request " + url + " failed: " + req.statusText);
+                                    reject("request ".concat(url, " failed: ").concat(req.statusText));
                                 }
                             };
                             req.send();
@@ -516,7 +516,7 @@
                                     }
                                 }
                                 else {
-                                    reject("request POST " + url + " failed: " + req.statusText);
+                                    reject("request POST ".concat(url, " failed: ").concat(req.statusText));
                                 }
                             };
                             req.send(JSON.stringify(data));
@@ -789,7 +789,7 @@
                     switch (_a.label) {
                         case 0:
                             if (!this.api.isJsonDump()) {
-                                return [2 /*return*/, this.api.getJson(this.modelId, "matrix", matrix + "?col=" + index)];
+                                return [2 /*return*/, this.api.getJson(this.modelId, "matrix", "".concat(matrix, "?col=").concat(index))];
                             }
                             return [4 /*yield*/, this.matrix(matrix)];
                         case 1:
@@ -807,7 +807,7 @@
          */
         WebModel.prototype.calculate = function (setup) {
             return __awaiter(this, void 0, void 0, function () {
-                var indicators, sectors, demand, sectorIdx, N, data, L, s, _a, D;
+                var indicators, sectors, demand, sectorIdx, N, data, L, D, s, _a;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
                         case 0:
@@ -860,7 +860,7 @@
                         case 9:
                             data = N.scaleColumns(demand).data;
                             return [3 /*break*/, 11];
-                        case 10: throw new Error("unknown perspective " + setup.perspective);
+                        case 10: throw new Error("unknown perspective ".concat(setup.perspective));
                         case 11: return [2 /*return*/, {
                                 data: data,
                                 indicators: indicators.map(function (indicator) { return indicator.code; }),
@@ -1031,10 +1031,99 @@
         return WebModel;
     }());
 
+    var SectorAnalysis = /** @class */ (function () {
+        function SectorAnalysis(model, sector, normalizationTotals) {
+            this.model = model;
+            this.sector = sector;
+            this.normalizationTotals = normalizationTotals;
+        }
+        /**
+         * Creates a sector analysis based on the calculation result of a specified
+         * demand vector.
+         *
+         * @param model the IO model
+         * @param sector the IO sector of the analysis
+         * @param demandId the ID of the demand vector for the analysis
+         */
+        SectorAnalysis.of = function (model, sector, demandId) {
+            return __awaiter(this, void 0, void 0, function () {
+                var demand, result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, model.demand(demandId)];
+                        case 1:
+                            demand = _a.sent();
+                            return [4 /*yield*/, model.calculate({
+                                    perspective: "direct",
+                                    demand: demand,
+                                })];
+                        case 2:
+                            result = _a.sent();
+                            return [2 /*return*/, new SectorAnalysis(model, sector, result.totals)];
+                    }
+                });
+            });
+        };
+        SectorAnalysis.prototype.getEnvironmentalProfile = function (directOnly) {
+            if (directOnly === void 0) { directOnly = false; }
+            return __awaiter(this, void 0, void 0, function () {
+                var profile, i;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, (directOnly
+                                ? this.model.column("D", this.sector.index)
+                                : this.model.column("N", this.sector.index))];
+                        case 1:
+                            profile = _a.sent();
+                            for (i = 0; i < profile.length; i++) {
+                                profile[i] /= this.normalizationTotals[i];
+                            }
+                            return [2 /*return*/, profile];
+                    }
+                });
+            });
+        };
+        SectorAnalysis.prototype.getImpactsByScope = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var total, direct, domesticTotal, upstreamTotal, upstreamDomestic, upstreamNonDomestic, i;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.model.column("N", this.sector.index)];
+                        case 1:
+                            total = _a.sent();
+                            return [4 /*yield*/, this.model.column("D", this.sector.index)];
+                        case 2:
+                            direct = _a.sent();
+                            return [4 /*yield*/, this.model.column("N_d", this.sector.index)];
+                        case 3:
+                            domesticTotal = _a.sent();
+                            upstreamTotal = zeros(total.length);
+                            upstreamDomestic = zeros(total.length);
+                            upstreamNonDomestic = zeros(total.length);
+                            for (i = 0; i < total.length; i++) {
+                                upstreamTotal[i] = total[i] - direct[i];
+                                upstreamDomestic[i] = domesticTotal[i] - direct[i];
+                                upstreamNonDomestic[i] = upstreamTotal[i] - upstreamDomestic[i];
+                            }
+                            return [2 /*return*/, {
+                                    direct: direct,
+                                    total: total,
+                                    upstreamTotal: upstreamTotal,
+                                    upstreamDomestic: upstreamDomestic,
+                                    upstreamNonDomestic: upstreamNonDomestic,
+                                }];
+                    }
+                });
+            });
+        };
+        return SectorAnalysis;
+    }());
+
     exports.CommodityVector = CommodityVector;
     exports.DemandVector = DemandVector;
     exports.Matrix = Matrix;
     exports.NaicsMap = NaicsMap;
+    exports.SectorAnalysis = SectorAnalysis;
     exports.WebApi = WebApi;
     exports.WebModel = WebModel;
     exports.max = max;

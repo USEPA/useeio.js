@@ -486,10 +486,43 @@ declare module "sectors" {
         toBea(naics: string | string[]): string[];
     }
 }
+declare module "sector-analysis" {
+    import { Sector } from "model";
+    import { WebModel } from "webapi";
+    /**
+     * Contains the indicator results related to one USD output of a sector for
+     * different scopes.
+     */
+    export interface ScopePartition {
+        direct: number[];
+        upstreamDomestic: number[];
+        upstreamNonDomestic: number[];
+        upstreamTotal: number[];
+        total: number[];
+    }
+    export class SectorAnalysis {
+        readonly model: WebModel;
+        readonly sector: Sector;
+        readonly normalizationTotals: number[];
+        constructor(model: WebModel, sector: Sector, normalizationTotals: number[]);
+        /**
+         * Creates a sector analysis based on the calculation result of a specified
+         * demand vector.
+         *
+         * @param model the IO model
+         * @param sector the IO sector of the analysis
+         * @param demandId the ID of the demand vector for the analysis
+         */
+        static of(model: WebModel, sector: Sector, demandId: string): Promise<SectorAnalysis>;
+        getEnvironmentalProfile(directOnly?: boolean): Promise<number[]>;
+        getImpactsByScope(): Promise<ScopePartition>;
+    }
+}
 declare module "useeio" {
     export * from "calc";
     export * from "matrix";
     export * from "model";
     export * from "sectors";
     export * from "webapi";
+    export * from "sector-analysis";
 }
