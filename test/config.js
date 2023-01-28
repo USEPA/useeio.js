@@ -13,7 +13,7 @@ const model = useeio.modelOf({
 */
 
 const model = useeio.modelOf({
-  endpoint: 'http://srocka.greendelta.com/api',
-  model: 'USEEIOv2.1-422',
+  endpoint: 'https://smmtool.app.cloud.gov/api',
+  model: 'USEEIOv2.0.1-411',
   asJsonFiles: false,
 });
