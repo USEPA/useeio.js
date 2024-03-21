@@ -13,14 +13,14 @@ to create a minified bundle.
 directly:
 
 ```
-$ npm install git+https://github.com/msrocka/useeio.js.git
+$ npm install git+https://github.com/useeio.js/useeio.js.git
 ```
 
 Alternatively, you can download and build it locally:
 
 ```bash
 $ cd {some folder}
-$ git clone https://github.com/msrocka/useeio.js.git
+$ git clone https://github.com/useeio.js/useeio.js.git
 $ cd useeio.js
 $ npm install
 $ npm run build
