@@ -32,7 +32,7 @@ This project contains a script for downloading a JSON dump of an USEEIO-API
 instance:
 
 ```
-$ node scripts\dumpjson.js --endpoint {URL}
+$ node scripts/dumpjson.js --endpoint {URL}
 ```
 
 Where `{URL}` is some API endpoint, like https://smmtool.app.cloud.gov/api. You
