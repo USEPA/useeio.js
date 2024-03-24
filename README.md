@@ -13,14 +13,14 @@ to create a minified bundle.
 directly:
 
 ```
-$ npm install git+https://github.com/msrocka/useeio.js.git
+$ npm install git+https://github.com/useeio.js/useeio.js.git
 ```
 
 Alternatively, you can download and build it locally:
 
 ```bash
 $ cd {some folder}
-$ git clone https://github.com/msrocka/useeio.js.git
+$ git clone https://github.com/useeio.js/useeio.js.git
 $ cd useeio.js
 $ npm install
 $ npm run build
@@ -32,7 +32,7 @@ This project contains a script for downloading a JSON dump of an USEEIO-API
 instance:
 
 ```
-$ node scripts\dumpjson.js --endpoint {URL}
+$ node scripts/dumpjson.js --endpoint {URL}
 ```
 
 Where `{URL}` is some API endpoint, like https://smmtool.app.cloud.gov/api. You

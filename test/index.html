@@ -4,7 +4,8 @@
 <head>
   <meta charset="utf-8" />
   <title>USEEIO API Tests</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
 </head>
 
@@ -26,12 +27,44 @@
 
 <script src="test.model-requests.js"></script>
 <script src="test.matrix-requests.js"></script>
-<!--
--->
 
   <script class="mocha-exec">
     mocha.run();
   </script>
-</body>
 
+<style>
+  a {
+    text-decoration:none;
+    color: #999;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+<div style="margin:50px;font-family: arial;line-height: 2em;">
+
+TO DO: Use formatCell() to make numbers simple. (42.2 Billion, etc.)<br>
+The function formatCell() is in the config.js file. The file config.js is already included in all the test pages.<br><br>
+
+<b>Example Pages</b><br>
+<a href="example_calculation.html">Example Calculation</a><br>
+<a href="example_commodity_vector.html">Example Commodity Vector</a><br>
+<a href="example_demands.html">Example Demands</a><br>
+<a href="example_model_info.html">Example Model Info</a><br>
+<a href="example_naics_map.html">Example Naics Map</a><br>
+<a href="example_sector_crosswalk.html">Example Sector Crosswalk</a><br>
+<a href="example_sector_profile.html">Example Sector Profile</a><br>
+<a href="example_sector_purchase_impacts.html">Example Sector Purchase Impacts</a><br>
+<a href="example_sector_scopes.html">Example Sector Scopes</a><br>
+<a href="example_sector_supply_impacts.html">Example Sector Supply Impacts</a><br>
+<a href="example_tabulator.html">Example Tabulator</a><br>
+<a href="test.matrix-requests.js">Matrix Requests (js)</a><br>
+<a href="test.model-requests.js">Model Requests (js)</a><br>
+<br>
+
+Some of the above samples may only send json to the console.log, so view with your browser's inspector.
+</div>
+
+</body>
 </html>
