@@ -1,4 +1,10 @@
-const fs = require('fs');
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+// Get the current directory equivalent to __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const buildDir = __dirname + '/../dist';
 for (const file of fs.readdirSync(buildDir)) {
