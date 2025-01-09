@@ -7,7 +7,7 @@ API](https://github.com/USEPA/USEEIO_API) that runs in the browser. It is writte
 
 [Javascript reports for the US EPA's 50 state models](https://model.earth/useeio.js/footprint) reside in the [model.earth fork](https://github.com/modelearth/useeio.js) of the useeio.js repo.
 
-You can contribute to the 50 state javascript reports without running building commands.
+You can contribute to the 50 state javascript reports without running the build commands.
 
 ## Build Comands
 
